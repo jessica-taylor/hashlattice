@@ -115,8 +115,10 @@ A variable is an object of the following form:
        // which may be current, next, or a combination
      }
 
-     (optional) 'default': // initial value we store for the variable
-                           // if unspecified, this will be null
+     (optional) 'default': function() {
+       // return initial value we store for the variable
+       // if unspecified, this will be null
+     }
     }
 
 If we see a list of values, we will start with the default and then proceed to merge with all the values in order.  It is also necessary to push new values out to the network.  There is probably a good algorithm for this.
