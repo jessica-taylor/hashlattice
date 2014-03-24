@@ -20,7 +20,7 @@ Rather that share arbitrary binary files, HashLattice allows the sharing of _dat
 
 Sometimes, it's useful to distribute a compressed version of a file, rather than the file itself.  But what if the user doesn't have the decompression algorithm installed?  In this case, you might consider providing the compressed file along with the decompression algorithm.
 
-HashLattice allows doing this (and more) using computations.  Think of a computation as a bundle containing both data and some Javascript code for transforming it.  The actual data objects shared on the HashLattice network are computations, rather than the original data objects.
+HashLattice allows doing this (and more) using computations.  Think of a computation as a bundle containing both data and some Javascript code for transforming it.  The code is run in a sandbox, so even untrusted code can be run safely.  The actual data objects shared on the HashLattice network are computations, rather than the original data objects.
 
 ### Dependency management
 
