@@ -20,7 +20,7 @@ Rather that share arbitrary binary files, HashLattice allows the sharing of _dat
 
 Sometimes, it's useful to distribute a compressed version of a file, rather than the file itself.  But what if the user doesn't have the decompression algorithm installed?  In this case, you might consider providing the compressed file along with the decompression algorithm.
 
-HashLattice allows doing this (and more) using computations.  Think of a computation as a bundle containing both data and some Javascript code for turning that data into different data.  The actual data objects shared on the HashLattice network are computations, rather than the original data objects.
+HashLattice allows doing this (and more) using computations.  Think of a computation as a bundle containing both data and some Javascript code for transforming it.  The actual data objects shared on the HashLattice network are computations, rather than the original data objects.
 
 ### Dependency management
 
@@ -30,7 +30,7 @@ To handle this issue, HashLattice allows computations to fetch data based on its
 
 This facility can do more than just make decompression easier.  It is possible to create files that are derived from existing files.  For example, there might be an old version of a document already in the network when you want to publish a new version.  You can publish a computation that uses the diff between the old and new versions, along with the old file, to construct the new version.  Users who have already downloaded the old file will only need to download the diff.
 
-It is also possible to split a file up into many different pieces that are combined with some decoding function.  The decoding function may perform functions such as concatenation, xor, and decryption on the parts.  Then, the owner can use a static computation that retrieves the pieces and feeds them through the decoding function.  For comparison, see the [OFF system](http://offsystem.sourceforge.net/).
+It is also possible to split a file up into many different pieces that are combined with some decoding function.  The decoding function may perform functions such as concatenation, xor, and decryption on the parts.  Then, the owner can use a computation that retrieves the pieces and feeds them through the decoding function.  For comparison, see the [OFF system](http://offsystem.sourceforge.net/).
 
 ### Functions
 
@@ -83,9 +83,9 @@ The main programming language used in HashLattice is Javascript.  It may be good
 
 The intention is that it's as close to a purely functional programming language you can get while still allowing internal data to be mutated.  This restriction can be accomplished with a Javascript sandbox.
 
-### Static computations
+### Computations
 
-A *static computation* is some Javascript code that produces a value and can access a few functions that are guaranteed to be deterministic.  Specifically, the form of the computation is data:
+A *computation* is some Javascript code that produces a value and can access a few functions that are guaranteed to be deterministic.  Specifically, the form of the computation is data:
 
     {'data': {
         // a mapping from variable name to data
@@ -94,13 +94,13 @@ A *static computation* is some Javascript code that produces a value and can acc
      'code': '// a Javascript expression that can use data variables and some functions'
     }
 
-Every static computation produces a deterministic result when evaluated.  The code is allowed to call a `evalStatic(comp)` function, which takes a static computation and returns its evaluation.
+Every computation produces a deterministic result when evaluated.  The code is allowed to call a `evalComputation(comp)` function, which takes a computation and returns its evaluation.
 
 If the `cache` boolean is set to true, then the system will attempt to cache the result of this computation.  The result of the computation must be data for this to work.
 
 ### Hash codes
 
-The main hash function used in HashLattice is SHA256.  It is possible to find the hash of a data value by finding the hash of its canonical binary representation.  Specifically, it is possible to find hash codes of static computations, as they are all data values.  The system (and eventually, the network) should store a mapping from hash codes to static computations.  Then, it is possible to provide a function that maps from a hash code to the result of evaluating the computation with this hash code.  This function is provided to static computations and is called `getHash(code)`.  Like `evalStatic`, `getHash` will take advantage of caching.  Hash codes can be easily used for dependency management, as explained in the applications section of this document.
+The main hash function used in HashLattice is SHA256.  It is possible to find the hash of a data value by finding the hash of its canonical binary representation.  Specifically, it is possible to find hash codes of computations, as they are all data values.  The system (and eventually, the network) should store a mapping from hash codes to computations.  Then, it is possible to provide a function that maps from a hash code to the result of evaluating the computation with this hash code.  This function is provided to computations and is called `getHash(code)`.  Like `evalComputation`, `getHash` will take advantage of caching.  Hash codes can be easily used for dependency management, as explained in the applications section of this document.
 
 ### Variables
 
@@ -119,13 +119,13 @@ A variable is an object of the following form:
 
 If we see a list of values, we will start with the default and then proceed to merge with all the values in order.  It is also necessary to push new values out to the network.  There is probably a good algorithm for this.
 
-Variables are values, so they can be specified as the result of evaluating a static computation.  Therefore, we can identify variables with the hash of the static computation producing the variable.  The fact that predicates are the result of evaluating a static computation implies that predicates can use the `getHash` function.  This makes it possible to, for example, create a predicate over linked lists in which the pointer of a linked list is represented as a hash code.
+Variables are values, so they can be specified as the result of evaluating a computation.  Therefore, we can identify variables with the hash of the computation producing the variable.  The fact that predicates are the result of evaluating a computation implies that predicates can use the `getHash` function.  This makes it possible to, for example, create a predicate over linked lists in which the pointer of a linked list is represented as a hash code.
 
 ### API
 
 HashLattice provides an API, which is accessible in a Javascript shell, other programming languages, and HashLattice web pages.  The API contains the following functions (TODO, this is incomplete):
 
-- `evalStatic`: Given a static computation, evaluate it.  This uses caching.
-- `getHash`: Given a hash code for a static computation, try to download and evaluate it.  This also using caching.
+- `evalComputation`: Given a computation, evaluate it.  This uses caching.
+- `getHash`: Given a hash code for a computation, try to download and evaluate it.  This also using caching.
 - `getVar`: Given a variable hash, return the current value for the variable.  This may require querying peers.
-- `putVar`: Given a variable static computation and a new value, merge the current value with the new value.  This may cause the new value to be pushed to other computers in the network.
+- `putVar`: Given a variable computation and a new value, merge the current value with the new value.  This may cause the new value to be pushed to other computers in the network.
