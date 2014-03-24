@@ -24,7 +24,7 @@ HashLattice allows doing this (and more) using computations.  Think of a computa
 
 ### Dependency management
 
-What if you want to distribute multiple files that are compressed with the same algorithm?  It would be wasteful to distribute the same compression algorithm multiple times.
+What if you want to distribute multiple files that are compressed with the same algorithm?  It would be wasteful to distribute the same decompression algorithm multiple times.
 
 To handle this issue, HashLattice allows computations to fetch data based on its hash code.  So, you could distribute the compressed file along with some code that will fetch the decompression algorithm's source code (using the hash of the source) and then use `eval()` to run the code on the compressed file.  This will prevent the user from having to download the compression multiple times, as it will be cached.
 
