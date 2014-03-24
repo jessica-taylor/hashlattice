@@ -56,7 +56,9 @@ Enter variables.  As the name suggests, variables specify a value that may chang
 
 If I already have one value for a particular variable, and I hear about another value from another computer on the network, how do I know how to update my value?  Each variable specifies exactly how to do this with a merge function.  `merge` should take two values (the current one the computer knows about, and the one it heard from somewhere else) and produce a new value.  Think of `merge` as either choosing the better value between the two, or combining the best of both values into a unified whole.  Formally, `merge` will usually be a least upper bound operator in a [semilattice](http://en.wikipedia.org/wiki/Semilattice).  Variables also specify a default value.  HashLattice web pages are allowed to fetch the current best value for any variable.
 
-As an example, consider a variable that stores the latest version of a document that has been signed by a particular public key.  To merge 2 documents, select the properly signed document with the latest time stamp, or `null` (the default) if neither document is valid.
+### Applications
+
+Variables are quite powerful.  Consider a variable that stores the latest version of a document that has been signed by a particular public key.  To merge 2 documents, select the properly signed document with the latest time stamp, or `null` (the default) if neither document is valid.
 
 Now it is possible to create a webpage that will fetch this variable.  It can display whatever document is associated with the variable.  The result is that the webpage is automatically updated whenever a new version of the document is published.  Since the initial HTML/Javascript for the webpage remains the same, the webpage will maintain the same hash code even when the document is updated.
 
