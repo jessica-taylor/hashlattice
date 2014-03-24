@@ -131,5 +131,6 @@ HashLattice provides an API, which is accessible in a Javascript shell, other pr
 
 - `evalComputation`: Given a computation, evaluate it.  This uses caching.
 - `getHash`: Given a hash code for a computation, try to download and evaluate it.  This also using caching.
+- `putHash`: Given a computation, store it in the system (indexed by its hash code) and allow peers to download it.
 - `getVar`: Given a variable hash, return the current value for the variable.  This may require querying peers.
 - `putVar`: Given a variable computation and a new value, merge the current value with the new value.  This may cause the new value to be pushed to other computers in the network.
