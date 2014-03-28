@@ -1,43 +1,39 @@
 
-var network = require('./network');
-var cache = require('./cache');
-var data = require('./data');
-var code = require('./code');
+var Network = require('./network');
+var Cache = require('./cache');
+var Value = require('./value');
+var Code = require('./code');
 
 function Server(kwargs) {
   this.network = kwargs.network;
   // hashCompCache maps hash code to computation with that hash
-  this.hashCompCache = kwargs.hashCompCache || new cache.MemoryCache();
+  this.hashCompCache = kwargs.hashCompCache || new Cache.MemoryCache();
   // hashEvalCache maps hash code to evaluation of the computation with that
   // hash, if this evaluation is data
-  this.hashEvalCache = kwargs.hashEvalCache || new cache.MemoryCache();
+  this.hashEvalCache = kwargs.hashEvalCache || new Cache.MemoryCache();
   // varCache maps hash code of variable computation to current data value for
   // the variable
-  this.varCache = kwargs.varCache || new cache.MemoryCache();
+  this.varCache = kwargs.varCache || new Cache.MemoryCache();
 }
 
 /**
  * Gets the computation with the given hashcode.
- * @param {Buffer} hashcode Hash code of the static computation.
+ * @param {Buffer} hash Hash code of the computation.
  * @param {function} callback
  */
 Server.prototype.getHashComputation = function(hash, callback) {
   this.hashCompCache.get(hash, callback);
 };
 
-/*
-Gets the evaluation of the static computation with the given hashcode.
-
-This uses caching to avoid evaluating the same static computation twice,
-but only if the computation specifies that it should be cached and the value
-is data.
-
-Arguments:
-  hashcode: Hash code of the static computation.
-
-Returns:
-  Evaluation of the static computation.
-*/
+/**
+ * Gets the evaluation of the computation with the given hashcode.
+ *
+ * This uses caching to avoid evaluating the same static computation twice,
+ * but only if the computation specifies that it should be cached and the value
+ * is data.
+ * @param {Buffer} hash Hash code of the computation
+ * @param {function} callback
+ */
 Server.prototype.getHash = function(hash, callback) {
   var self = this;
   this.getHashComputation(hash, function(comp) {
@@ -64,14 +60,13 @@ Returns:
   */
 Server.prototype._rawEvalComputation = function(hash, comp, callback) {
   var self = this;
-  code.evalComputation(comp, {
+  Code.evalComputation(comp, {
       getHash: self.getHash,
       evalComputation: self.evalComputation,
       getHashComputation: self.getHashComputation
     }, function(success, result) {
       if (success) {
-        if (comp.cache) {
-          // TODO only cache data
+        if (comp.cache && Value.isData(result)) {
           self.hashEvalCache.put(hash, result, function() { 
             callback(true, result); 
           });
@@ -98,7 +93,7 @@ Returns:
 */
 Server.prototype.evalComputation = function(comp, callback) {
   var self = this;
-  var hash = data.hashData(comp);
+  var hash = Value.hashData(comp);
   self.hashEvalCache.get(hash, function(found, result) {
     if (found) {
       callback(true, result);
@@ -109,15 +104,18 @@ Server.prototype.evalComputation = function(comp, callback) {
 };
 
 /*
- * Inserts the given static computation into the cache.
+ * Inserts the given data value (often a static computation) into the cache.
 
 Arguments:
   comp: The static computation.
 */
-Server.prototype.putHash = function(comp, callback) {
+Server.prototype.putHash = function(value, callback) {
   var self = this;
-  // TODO: check if data
-  self.hashCompCache.put(data.hashData(comp), comp, callback);
+  if (Value.isData(value)) {
+    self.hashCompCache.put(Value.hashData(value), comp, callback);
+  } else {
+    callback(false);
+  }
 };
 
 Server.prototype.getVar = function(varComp, callback) {
@@ -126,7 +124,7 @@ Server.prototype.getVar = function(varComp, callback) {
     if (success) {
       // TODO: try catch
       var defaultValue = varSpec.defaultValue();
-      self.varCache.get(data.hashData(varComp), function(found, value) {
+      self.varCache.get(Value.hashData(varComp), function(found, value) {
         if (found) {
           // TODO: try catch
           callback(true, varSpec.merge(defaultValue, value));
@@ -144,7 +142,7 @@ Server.prototype.putVar = function(varComp, value, callback) {
   var self = this;
   self.evalComputation(varComp, function(success, varSpec) {
     if (success) {
-      var hash = data.hashData(varComp);
+      var hash = Value.hashData(varComp);
       self.varCache.get(hash, function(found, oldValue) {
         if (found) {
           // TODO: try catch
