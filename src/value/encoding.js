@@ -1,8 +1,9 @@
 /**
- * Facilities for working with data values.
+ * Facilities for binary encoding values.
  */
 
-var crypto = require('crypto');
+var assert = require('better-assert');
+var Types = require('./types')
 
 /**
  * @typedef BufferReader
@@ -44,33 +45,60 @@ function decodeWith(coder, buf) {
   return coder.decode({buffer: buf, pos: 0});
 }
 
-// Coders are monad-like.
-function coderSequence(firstCoder, getFirst, secondCoderGetter) {
+function constCoder(value) {
   return {
-    encode: function(value, bufs) {
-      var first = getFirst(value);
-      firstCoder.encode(first, bufs);
-      secondCoderGetter(first).encode(value, bufs);
+    encode: function(val, bufs) { 
+      assert(val === value);
     },
-    decode: function(reader) {
-      var first = firstCoder.decode(reader);
-      return secondCoderGetter(first).decode(reader);
+    decode: function(reader) { 
+      return value; 
     }
   };
 }
 
+function composeFunctionWithCoder(encodeFun, decodeFun, coder) {
+  return {
+    encode: function(value, bufs) { },
+    decode: function(reader) {
+      return decodeFun(coder.decode(reader));
+    }
+  };
+}
 
 // see http://nodejs.org/api/buffer.html for more types
 doubleCoder = numberCoder('DoubleLE');
 int32Coder = numberCoder('Int32LE');
 uint8Coder = numberCoder('Uint8');
 
+nullCoder = constCoder(null);
+booleanCoder = composeFunctionWithCoder(Number, Boolean, uint8Coder);
+
+// This stores a number of bytes in the number as a byte, then all the number's
+// bytes (in little endian order).  In theory, it can store any number up to
+// 256^255-1.  In practice, this will be restricted to 2^32-1 to prevent issues
+// with numeric precision.
 bigSizeCoder = {
-  // TODO: big integer stuff
+  encode: function(value, bufs) {
+    var bytes = [0];
+    while (value > 0) {
+      bytes[0]++;
+      bytes.push(value % 256);
+      value = Math.floor(value / 256);
+    }
+    bufs.push(new Buffer(bytes));
+  },
+  decode: function(reader) {
+    var size = uint8Coder.decode(reader);
+    assert(size <= 4);
+    var value = 0;
+    for (var i = 0; i < size; i++) {
+      value = (value * 256) + uint8Coder.decode(reader);
+    }
+    return value;
+  }
 };
 
-// TODO: switch to bigSizeCoder
-lengthCoder = int32Coder;
+lengthCoder = bigSizeCoder;
 
 stringCoder = {
   encode: function(str, bufs) {
@@ -144,45 +172,23 @@ function dictCoder(elemCoder) {
 
 // Will be set later.
 var valueTypeCoders = {};
-var valueCoderTypeList = ['double', 'string', 'buffer', 'array', 'dict'];
-var valueTypeToIndex = {};
-for (var i = 0; i < valueCoderTypeList.length; i++) {
-  valueTypeToIndex[valueCoderTypeList[i]] = i;
-}
-
-function valueType(value) {
-  if (typeof value == 'string') {
-    return 'string';
-  }
-  if (typeof value == 'number') {
-    return 'double';
-  }
-  if (typeof value == 'object') {
-    if (Array.isArray(value)) {
-      return 'array'
-    } else if (Buffer.isBuffer(value)) {
-      return 'buffer';
-    } else {
-      return 'dict';
-    }
-  }
-  throw 'unknown type: ' + value;
-}
 
 var valueCoder = {
   encode: function(value, bufs) {
-    var type = valueType(value);
-    uint8Coder.encode(valueTypeToIndex[type], bufs);
+    var type = Types.valueType(value);
+    uint8Coder.encode(Types.typeToIndex(type), bufs);
     valueTypeCoders[type].encode(value, bufs);
   },
   decode: function(reader) {
     var typeIndex = uint8Coder.decode(reader);
-    var type = valueCoderTypeList[typeIndex];
+    var type = Types.typeList[typeIndex];
     return valueTypeCoders[type].decode(reader);
   }
 };
 
 valueTypeCoders = {
+  'null': nullCoder,
+  'boolean': booleanCoder,
   'double': doubleCoder,
   'string': stringCoder,
   'buffer': bufferCoder,
@@ -190,27 +196,15 @@ valueTypeCoders = {
   'dict': dictCoder(valueCoder)
 };
 
-function encodeData(data) {
-  return encodeWith(valueCoder, data);
+function encodeValue(value) {
+  return encodeWith(valueCoder, value);
 }
 
-function decodeData(buf) {
+function decodeValue(buf) {
   return decodeWith(valueCoder, buf);
 }
 
-function hashBytes(buf) {
-  var h = crypto.createHash('sha256');
-  h.update(buf);
-  return new Buffer(h.digest('hex'), 'hex');
-}
-
-function hashData(data) {
-  return hashBytes(encodeData(data));
-}
-
 module.exports = {
-  encodeData: encodeData,
-  decodeData: decodeData,
-  hashBytes: hashBytes,
-  hashData: hashData
+  encodeValue: encodeValue,
+  decodeValue: decodeValue
 };
