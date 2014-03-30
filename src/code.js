@@ -34,6 +34,17 @@ function evalComputation(comp, api, callback) {
   }
 }
 
+/**
+ * A simple computation returning the given data.
+ */
+function identityComputation(x) {
+  return {
+    data: {x: x},
+    code: 'x'
+  };
+}
+
 module.exports = {
-  evalComputation: evalComputation
+  evalComputation: evalComputation,
+  identityComputation: identityComputation
 };
