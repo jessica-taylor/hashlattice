@@ -58,7 +58,9 @@ function constCoder(value) {
 
 function composeFunctionWithCoder(encodeFun, decodeFun, coder) {
   return {
-    encode: function(value, bufs) { },
+    encode: function(value, bufs) { 
+      bufs.push(coder.encode(encodeFun(value)));
+    },
     decode: function(reader) {
       return decodeFun(coder.decode(reader));
     }
