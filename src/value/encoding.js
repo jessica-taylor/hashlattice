@@ -67,10 +67,27 @@ function composeFunctionWithCoder(encodeFun, decodeFun, coder) {
   };
 }
 
+function numberCoder(bytes, name) {
+  var writeMethod = Buffer.prototype['write' + name];
+  var readMethod = Buffer.prototype['read' + name];
+  return {
+    encode: function(value, bufs) {
+      var buffer = new Buffer(bytes);
+      writeMethod.call(buffer, value);
+      bufs.push(buffer);
+    },
+    decode: function(reader) {
+      var value = readMethod.call(reader.buffer, reader.pos);
+      reader.pos += bytes;
+      return value;
+    }
+  };
+}
+
 // see http://nodejs.org/api/buffer.html for more types
-doubleCoder = numberCoder('DoubleLE');
-int32Coder = numberCoder('Int32LE');
-uint8Coder = numberCoder('Uint8');
+doubleCoder = numberCoder(8, 'DoubleLE');
+int32Coder = numberCoder(4, 'Int32LE');
+uint8Coder = numberCoder(1, 'Uint8');
 
 nullCoder = constCoder(null);
 booleanCoder = composeFunctionWithCoder(Number, Boolean, uint8Coder);
