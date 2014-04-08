@@ -35,38 +35,6 @@ MemoryCache.prototype.put = function(key, value, callback) {
   callback(true);
 };
 
-function LayeredCache(cache1, cache2) {
-  this.cache1 = cache1;
-  this.cache2 = cache2;
-}
-
-LayeredCache.prototype.get = function(key, callback) {
-  var self = this;
-  self.cache1.get(key, function(found1, value1) {
-    if (found1) {
-      callback(true, value1);
-    } else {
-      self.cache2.get(key, function(found2, value2) {
-        if (found2) {
-          self.cache1.put(key, value2, function() {
-            callback(true, value2);
-          });
-        } else {
-          callback(false);
-        }
-      }
-    }
-  });
-};
-
-LayeredCache.prototype.put = function(key, value, callback) {
-  self.cache1.put(key, value, function(success1) {
-    self.cache2.put(key, value, function(success2) {
-      callback(success1 && success2);
-    });
-  });
-};
-
 function FileCache(directory) {
   this.directory = directory;
 }
@@ -111,8 +79,52 @@ NetworkCache.prototype.put = function(key, value, callback) {
   this.network.put(key, Value.encodeValue(value), callback);
 };
 
+function LayeredCache(cache1, cache2) {
+  this.cache1 = cache1;
+  this.cache2 = cache2;
+}
+
+LayeredCache.prototype.get = function(key, callback) {
+  var self = this;
+  self.cache1.get(key, function(found1, value1) {
+    if (found1) {
+      callback(true, value1);
+    } else {
+      self.cache2.get(key, function(found2, value2) {
+        if (found2) {
+          self.cache1.put(key, value2, function() {
+            callback(true, value2);
+          });
+        } else {
+          callback(false);
+        }
+      }
+    }
+  });
+};
+
+LayeredCache.prototype.put = function(key, value, callback) {
+  var self = this;
+  self.cache1.put(key, value, function(success1) {
+    self.cache2.put(key, value, function(success2) {
+      callback(success1 && success2);
+    });
+  });
+};
+
+function layerCaches() {
+  var cache = arguments[0];
+  for (var i = 1; i < arguments.length; i++) {
+    cache = new LayeredCache(cache, arguments[i]);
+  }
+  return cache;
+}
+
 module.exports = {
   Cache: Cache,
   MemoryCache: MemoryCache,
-  LayeredCache: LayeredCache
+  FileCache: FileCache,
+  NetworkCache: NetworkCache,
+  LayeredCache: LayeredCache,
+  layerCaches: layerCaches
 };
