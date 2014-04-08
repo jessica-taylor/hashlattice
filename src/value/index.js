@@ -74,6 +74,9 @@ function hashData(data) {
 }
 
 module.exports = {
+  valueType: Types.valueType,
+  isData: isData,
+  valuesEqual: valuesEqual,
   encodeValue: encodeValue,
   decodeValue: decodeValue,
   hashBytes: hashBytes,
