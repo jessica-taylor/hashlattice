@@ -2,6 +2,8 @@
  * Defines basic network interfaces and operations.
  */
 
+kadoh = require('kadoh');
+
 /**
  * Interface that provides networking primitives.
  * @interface
@@ -25,6 +27,25 @@ NetworkServer.prototype.get = function(key, callback) { };
  */
 NetworkServer.prototype.put = function(key, value, callback) { };
 
+function KadohNetwork(node) {
+  if (!node) {
+    // TODO bootstraps
+    node = new kadoh.Node(null, {
+      bootstraps: []
+    });
+  }
+  this.node = node;
+}
+
+KadohNetwork.prototype.get = function(key, callback) {
+  this.node.get(key, callback);
+};
+
+KadohNetwork.prototype.put = function(key, value, callback) {
+  this.node.put(key, value, callback);
+};
+
 module.exports = {
-  NetworkServer: NetworkServer
+  NetworkServer: NetworkServer,
+  KadohNetwork: KadohNetwork
 };
