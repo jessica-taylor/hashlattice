@@ -1,0 +1,24 @@
+{
+  "name": "hashlattice",
+  "version": "0.0.1",
+  "description": "A distributed network to replace much of the web.",
+  "license": "MIT",
+  "author": "Jessica Taylor <jessica.liu.taylor@gmail.com> (http://jessic.at/)",
+  "contributors": [
+    "Mario Villaplana <mario.villaplana@gmail.com>",
+    "Ashwin Siripurapu <eeshking@gmail.com>"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/jessica-taylor/hashlattice.git"
+  },
+  "dependencies": {
+    "better-assert": "1.0.x",
+    "kadoh": "https://github.com/jinroh/kadoh/tarball/master"
+  },
+  "dev-dependencies": {
+    "mocha": "x.x.x"
+  }
+}
+
+  
