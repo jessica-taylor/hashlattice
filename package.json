@@ -13,6 +13,7 @@
     "url": "http://github.com/jessica-taylor/hashlattice.git"
   },
   "dependencies": {
+    "underscore": "1.6.x",
     "better-assert": "1.0.x",
     "kadoh": "https://github.com/jinroh/kadoh/tarball/master"
   },
