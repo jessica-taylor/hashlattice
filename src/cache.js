@@ -2,13 +2,15 @@
  * Interfaces and implementations for caches.
  */
 
+var fs = require('fs');
+var path = require('path');
+var Value = require('./value');
+
 /**
  * Cache interface.
  * @interface
  */
 function Cache() { }
-
-Cache.prototype.contains = function(key, callback) { };
 
 Cache.prototype.get = function(key, callback) { };
 
@@ -18,10 +20,6 @@ Cache.prototype.put = function(key, value, callback) { };
 function MemoryCache(initial) {
   this.cache = initial || {};
 }
-
-MemoryCache.prototype.contains = function(key) {
-  return key.toString('hex') in this.cache;
-};
 
 MemoryCache.prototype.get = function(key, callback) {
   var str = key.toString('hex');
@@ -41,17 +39,6 @@ function LayeredCache(cache1, cache2) {
   this.cache1 = cache1;
   this.cache2 = cache2;
 }
-
-LayeredCache.prototype.contains = function(key, callback) {
-  var self = this;
-  self.cache1.contains(key, function(contains1) {
-    if (contains1) {
-      callback(true);
-    } else {
-      self.cache2.contains(key, callback);
-    }
-  });
-};
 
 LayeredCache.prototype.get = function(key, callback) {
   var self = this;
@@ -80,20 +67,48 @@ LayeredCache.prototype.put = function(key, value, callback) {
   });
 };
 
+function FileCache(directory) {
+  this.directory = directory;
+}
+
+FileCache.prototype.getFile = function(key) {
+  return path.join(this.directory, key);
+};
+
+FileCache.prototype.get = function(key, callback) {
+  fs.readFile(this.getFile(key), function(err, data) {
+    if (err) {
+      callback(false, err);
+    }
+    callback(true, Value.decodeValue(data));
+  });
+};
+
+FileCache.prototype.put = function(key, value, callback) {
+  fs.writeFile(this.getFile(key), Value.encodeValue(value), function(err) {
+    if (err) {
+      callback(false, err);
+    }
+    callback(true);
+  });
+};
+
 function NetworkCache(network) {
   this.network = network;
 }
 
-NetworkCache.prototype.contains = function(key, callback) {
-  this.get(key, function(found) { callback(found); });
-};
-
 NetworkCache.prototype.get = function(key, callback) {
-  this.network.get(key, callback);
+  this.network.get(key, function(found, binary) {
+    if (found) {
+      callback(true, Value.decodeValue(binary));
+    } else {
+      callback(false);
+    }
+  });
 };
 
-NetworkCache.prototype.put = function(key, callback) {
-  this.network.put(key, callback);
+NetworkCache.prototype.put = function(key, value, callback) {
+  this.network.put(key, Value.encodeValue(value), callback);
 };
 
 module.exports = {
