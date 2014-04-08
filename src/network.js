@@ -2,6 +2,7 @@
  * Defines basic network interfaces and operations.
  */
 
+assert = require('better-assert');
 kadoh = require('kadoh');
 
 /**
@@ -27,13 +28,13 @@ NetworkServer.prototype.get = function(key, callback) { };
  */
 NetworkServer.prototype.put = function(key, value, callback) { };
 
+/**
+ * A network server based on a Kadoh node.
+ * @param {kadoh.Node} node Kadoh node for this machine.
+ * @constructor
+ */
 function KadohNetwork(node) {
-  if (!node) {
-    // TODO bootstraps
-    node = new kadoh.Node(null, {
-      bootstraps: []
-    });
-  }
+  assert(node);
   this.node = node;
 }
 
