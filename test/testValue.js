@@ -8,6 +8,7 @@ var testDataValues = [
   null,
   true,
   false,
+  'he',
   'hello',
   new Buffer('af4532', 'hex'),
   [],
@@ -29,6 +30,14 @@ describe('value', function() {
                      Value.valuesEqual(testDataValues[i], testDataValues[j]),
                      util.inspect([testDataValues[i], testDataValues[j]]));
       }
+    }
+  });
+  describe('encodeValue', function() {
+    for (var i = 0; i < testDataValues.length; i++) {
+      var orig = testDataValues[i];
+      var enc = Value.encodeValue(orig);
+      var dec = Value.decodeValue(enc);
+      assert(Value.valuesEqual(orig, dec), util.inspect([orig, dec]));
     }
   });
 });
