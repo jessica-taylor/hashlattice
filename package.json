@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "underscore": "1.6.x",
-    "better-assert": "1.0.x",
+    "async": "0.7.x",
     "kadoh": "https://github.com/jinroh/kadoh/tarball/master"
   },
   "dev-dependencies": {
