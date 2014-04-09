@@ -24,21 +24,25 @@ var testDataValues = [
 
 describe('value', function() {
   describe('valuesEqual', function() {
-    for (var i = 0; i < testDataValues.length; i++) {
-      for (var j = 0; j < testDataValues.length; j++) {
-        assert.equal(i == j,
-                     Value.valuesEqual(testDataValues[i], testDataValues[j]),
-                     util.inspect([testDataValues[i], testDataValues[j]]));
+    it('should return true for equal values, false for unequal', function() {
+      for (var i = 0; i < testDataValues.length; i++) {
+        for (var j = 0; j < testDataValues.length; j++) {
+          assert.equal(i == j,
+                       Value.valuesEqual(testDataValues[i], testDataValues[j]),
+                       util.inspect([testDataValues[i], testDataValues[j]]));
+        }
       }
-    }
+    });
   });
   describe('encodeValue', function() {
-    for (var i = 0; i < testDataValues.length; i++) {
-      var orig = testDataValues[i];
-      var enc = Value.encodeValue(orig);
-      var dec = Value.decodeValue(enc);
-      assert(Value.valuesEqual(orig, dec), util.inspect([orig, dec]));
-    }
+    it('should result in an equal value after decoding', function() {
+      for (var i = 0; i < testDataValues.length; i++) {
+        var orig = testDataValues[i];
+        var enc = Value.encodeValue(orig);
+        var dec = Value.decodeValue(enc);
+        assert(Value.valuesEqual(orig, dec), util.inspect([orig, dec]));
+      }
+    });
   });
 });
 
