@@ -40,6 +40,18 @@ describe('code', function() {
         done();
       });
     });
+    it('should report syntax errors', function(done) {
+      Code.evalComputation({code: '(]'}, {}, function(err, result) {
+        assert(err);
+        done();
+      });
+    });
+    it('should report runtime errors', function(done) {
+      Code.evalComputation({code: '("hello")(4)'}, {}, function(err, result) {
+        assert(err);
+        done();
+      });
+    });
   });
   describe('identityComputation', function() {
     it('should create computations returning the value', function(done) {

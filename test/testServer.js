@@ -60,4 +60,29 @@ describe('Server', function() {
       });
     });
   });
+  describe('evalComputation', function() {
+    var comp = {data: {x: 5}, code: 'x+1'};
+    var hash = Value.hashData(comp);
+    var value = 6;
+    it('should check hashEvalCache', function(done) {
+      var s = new Server({
+        hashEvalCache: new Cache.MemoryCache([[hash, value]])
+      });
+      s.evalComputation(comp, function(err, val) {
+        assert(!err, err);
+        assert.equal(value, val);
+        done();
+      });
+    });
+    it('should evaluate computations', function(done) {
+      var s = new Server({
+        hashDataCache: new Cache.MemoryCache([[hash, comp]])
+      });
+      s.evalComputation(comp, function(err, val) {
+        assert(!err, err);
+        assert.equal(value, val);
+        done();
+      });
+    });
+  });
 });
