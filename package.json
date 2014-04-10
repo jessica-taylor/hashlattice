@@ -18,7 +18,8 @@
     "kadoh": "https://github.com/jinroh/kadoh/tarball/master"
   },
   "dev-dependencies": {
-    "mocha": "x.x.x"
+    "mocha": "x.x.x",
+    "istanbul": "x.x.x"
   }
 }
 
