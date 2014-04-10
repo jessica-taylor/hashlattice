@@ -16,7 +16,8 @@
     "underscore": "1.6.x",
     "async": "0.7.x",
     "kadoh": "https://github.com/jinroh/kadoh/tarball/master",
-    "mkdirp": "0.3.x"
+    "mkdirp": "0.3.x",
+    "js-yaml": "3.0.x"
   },
   "devDependencies": {
     "mocha": "x.x.x",
