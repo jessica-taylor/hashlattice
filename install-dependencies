@@ -1,0 +1,3 @@
+#!/bin/sh
+# This script installs dependencies in the local directory.
+npm install

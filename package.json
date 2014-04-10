@@ -17,7 +17,7 @@
     "async": "0.7.x",
     "kadoh": "https://github.com/jinroh/kadoh/tarball/master"
   },
-  "dev-dependencies": {
+  "devDependencies": {
     "mocha": "x.x.x",
     "istanbul": "x.x.x"
   }
