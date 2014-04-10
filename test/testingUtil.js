@@ -1,3 +1,4 @@
+// some data values to test things on
 var testDataValues = [
   10,
   null,
@@ -9,7 +10,7 @@ var testDataValues = [
   [],
   [1, 2],
   [1, 2, 3],
-  [1, 2, 4],
+  [1, 2, null],
   [true, 2, [false, 'hi', new Buffer('abc5f7', 'hex')]],
   {},
   {'a': 1, 'b': 2},
