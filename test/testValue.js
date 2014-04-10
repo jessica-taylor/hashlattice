@@ -1,5 +1,5 @@
 var assert = require('assert');
-var util = require('util');
+var Util = require('util');
 
 var Value = require('../lib/value');
 
@@ -29,7 +29,7 @@ describe('value', function() {
         for (var j = 0; j < testDataValues.length; j++) {
           assert.equal(i == j,
                        Value.valuesEqual(testDataValues[i], testDataValues[j]),
-                       util.inspect([testDataValues[i], testDataValues[j]]));
+                       Util.inspect([testDataValues[i], testDataValues[j]]));
         }
       }
     });
@@ -40,7 +40,7 @@ describe('value', function() {
         var orig = testDataValues[i];
         var enc = Value.encodeValue(orig);
         var dec = Value.decodeValue(enc);
-        assert(Value.valuesEqual(orig, dec), util.inspect([orig, dec]));
+        assert(Value.valuesEqual(orig, dec), Util.inspect([orig, dec]));
       }
     });
   });
