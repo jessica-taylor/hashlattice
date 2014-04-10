@@ -27,22 +27,43 @@ var testDataValues = [
 
 describe('Server', function() {
   describe('getHashData', function() {
+    var value = [1, 2, {}];
+    var hash = Value.hashData(value);
     it('should check hashDataCache', function(done) {
-      var value = [1, 2, {}];
-      var key = Value.hashData(value);
       var s = new Server({
-        hashDataCache: {
-          get: function(k, cb) {
-            assert.equal(k, key);
-            cb(null, value);
-          }
-        },
-        hashEvalCache: {}
+        hashDataCache: new Cache.MemoryCache([[hash, value]])
       });
-      s.getHashData(key, function(err, val) {
+      s.getHashData(hash, function(err, val) {
         assert(!err);
         assert(Value.valuesEqual(value, val));
         done();
+      });
+    });
+    it('should report errors correctly', function(done) {
+      var s = new Server({
+        hashDataCache: {
+          get: function(k, cb) {
+            cb('asdf');
+          }
+        }
+      });
+      s.getHashData(hash, function(err, val) {
+        assert.equal('asdf', err);
+        done();
+      });
+    });
+  });
+  describe('getHash', function() {
+    var comp = {data: {x: 5}, code: 'x+1'};
+    var hash = Value.hashData(comp);
+    var value = 6;
+    it('should check hashEvalCache', function(done) {
+      var s = new Server({
+        hashEvalCache: new Cache.MemoryCache([[hash, value]])
+      });
+      s.getHash(hash, function(err, val) {
+        assert(!val);
+        assert.equal(val, value);
       });
     });
   });
