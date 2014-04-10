@@ -15,7 +15,8 @@
   "dependencies": {
     "underscore": "1.6.x",
     "async": "0.7.x",
-    "kadoh": "https://github.com/jinroh/kadoh/tarball/master"
+    "kadoh": "https://github.com/jinroh/kadoh/tarball/master",
+    "mkdirp": "0.3.x"
   },
   "devDependencies": {
     "mocha": "x.x.x",
