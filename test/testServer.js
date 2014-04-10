@@ -44,8 +44,9 @@ describe('Server', function() {
         hashEvalCache: new Cache.MemoryCache([[hash, value]])
       });
       s.getHash(hash, function(err, val) {
-        assert(!val);
+        assert(!err, err);
         assert.equal(val, value);
+        done();
       });
     });
   });
