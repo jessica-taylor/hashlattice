@@ -45,7 +45,17 @@ describe('Server', function() {
       });
       s.getHash(hash, function(err, val) {
         assert(!err, err);
-        assert.equal(val, value);
+        assert.equal(value, val);
+        done();
+      });
+    });
+    it('should evaluate computations', function(done) {
+      var s = new Server({
+        hashDataCache: new Cache.MemoryCache([[hash, comp]])
+      });
+      s.getHash(hash, function(err, val) {
+        assert(!err, err);
+        assert.equal(value, val);
         done();
       });
     });
