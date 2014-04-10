@@ -1,0 +1,2 @@
+#!/bin/sh
+istanbul cover _mocha -- -R nyan && xdg-open coverage/lcov-report/index.html
