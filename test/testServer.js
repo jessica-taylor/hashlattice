@@ -59,6 +59,13 @@ describe('Server', function() {
         done();
       });
     });
+    it('should report when things are not found', function(done) {
+      var s = new Server();
+      s.getHash(hash, function(err, val) {
+        assert.equal('not found', err);
+        done();
+      });
+    });
   });
   describe('evalComputation', function() {
     var comp = {data: {x: 5}, code: 'x+1'};
@@ -83,6 +90,10 @@ describe('Server', function() {
         assert.equal(value, val);
         done();
       });
+    });
+  });
+  describe('putHash', function() {
+    it('should insert data so it can be gotten', function(done) {
     });
   });
 });
