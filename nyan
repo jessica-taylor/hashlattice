@@ -1,2 +1,2 @@
 #!/bin/sh
-mocha -R nyan
+node_modules/.bin/mocha -R nyan

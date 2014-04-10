@@ -1,2 +1,2 @@
 #!/bin/sh
-mocha -R spec
+node_modules/.bin/mocha -R spec
