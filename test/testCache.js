@@ -55,6 +55,9 @@ describe('MemoryCache', function() {
     testCache(new Cache.MemoryCache(), {});
   });
   describe('initialized', function() {
-    testCache(new Cache.MemoryCache(testInitValues), testInitValues);
+    var initValuesPairs = _.map(_.pairs(testInitValues), function(kv) {
+      return [new Buffer(kv[0], 'hex'), kv[1]];
+    });
+    testCache(new Cache.MemoryCache(initValuesPairs), testInitValues);
   });
 });
