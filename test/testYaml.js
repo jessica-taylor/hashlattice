@@ -40,7 +40,6 @@ describe('yaml', function() {
     });
     it('should allow dependencies', function(done) {
       Yaml.loadYamlFile(dependentYamlFile, function(err, data) {
-        console.log('in callback');
         assert(!err, err);
         assert(Value.valuesEqual(dependentData, data));
         done();
