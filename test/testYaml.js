@@ -46,5 +46,17 @@ describe('yaml', function() {
         done();
       });
     });
+    it('should detect circular dependencies', function(done) {
+      Yaml.loadYamlFile('./test/testdata/circular.yaml', function(err, data) {
+        assert.equal('circular dependency', err);
+        done();
+      });
+    });
+    it('should detect mutual dependencies', function(done) {
+      Yaml.loadYamlFile('./test/testdata/mutual1.yaml', function(err, data) {
+        assert.equal('circular dependency', err);
+        done();
+      });
+    });
   });
 });
