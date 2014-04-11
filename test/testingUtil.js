@@ -1,12 +1,15 @@
 // some data values to test things on
 var testDataValues = [
   10,
+  11,
   null,
   true,
   false,
   'he',
   'hello',
+  'lalal',
   new Buffer('af4532', 'hex'),
+  new Buffer('af4533', 'hex'),
   [],
   [1, 2],
   [1, 2, 3],
