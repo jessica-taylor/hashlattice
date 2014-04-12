@@ -1,0 +1,6 @@
+- 1
+- 2
+- !includeYaml simpleData.yaml
+- !hashYaml simpleData.yaml
+- !includeBinary image.png
+- !hashBinary image.png
