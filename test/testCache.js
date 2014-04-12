@@ -1,5 +1,7 @@
 var assert = require('assert');
+
 var Async = require('async');
+var mkdirp = require('mkdirp');
 var _ = require('underscore');
 
 var Value = require('../lib/value');
@@ -59,5 +61,19 @@ describe('MemoryCache', function() {
       return [new Buffer(kv[0], 'hex'), kv[1]];
     });
     testCache(new Cache.MemoryCache(initValuesPairs), testInitValues);
+  });
+});
+
+var dir = '/tmp/hashlattice_test_' + Math.random();
+mkdirp(dir, function(err) {
+  assert(!err, err);
+  describe('FileCache', function() {
+    describe('empty', function() {
+      testCache(new Cache.FileCache(dir), {});
+    });
+    describe('initialized', function() {
+      testCache(new Cache.FileCache(dir), _.extend(_.clone(testInitValues),
+                                                   testValues));
+    });
   });
 });
