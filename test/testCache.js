@@ -18,7 +18,7 @@ function assertValuesEqual(cache, keys, values, callback) {
   Async.map(keys, function(key, cb) {
     cache.get(new Buffer(key, 'hex'), function(err, value) {
       if (err == 'not found') {
-        assert(!(key in values));
+        assert(!(key in values), 'key ' + key + ' not found, but should');
       } else {
         assert(!err);
         assert(Value.valuesEqual(value, values[key]));
@@ -72,8 +72,7 @@ mkdirp(dir, function(err) {
       testCache(new Cache.FileCache(dir), {});
     });
     describe('initialized', function() {
-      testCache(new Cache.FileCache(dir), _.extend(_.clone(testInitValues),
-                                                   testValues));
+      testCache(new Cache.FileCache(dir), testValues);
     });
   });
 });
