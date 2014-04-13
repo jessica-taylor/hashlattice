@@ -1,0 +1,7 @@
+data:
+  response:
+    headers:
+      "Content-Type": "text/html"
+    content: |
+      <html><body><p>Here's a page!</p></body></html>
+code: "response"
