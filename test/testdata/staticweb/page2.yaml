@@ -1,0 +1,7 @@
+data:
+  headers:
+    "Content-Type": "text/html"
+  content: |
+    <html><body><p>Here's another page!</p></body></html>
+code: |
+  {headers: headers, content: new Buffer(content, 'utf8')}
