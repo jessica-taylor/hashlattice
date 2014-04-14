@@ -41,17 +41,17 @@ def main(argv):
             # set up named pipe
             time_now = datetime.datetime.now()
 
-            pipe_name = os.path.join(tmpdir, ''.join(['namedpipe-', time_now.strftime("%Y-%m-%d_%I:%M:%s.%f")]))
+            pipe_name = os.path.join(tmpdir, 'namedpipe-' + time_now.strftime("%Y-%m-%d_%I:%M:%s.%f"))
             pipe_names.add(pipe_name)
 
             os.mkfifo(pipe_name)
-            named_pipe = open(pipe_name, 'w')
+            named_pipe = open(pipe_name, 'w') # maybe 'a' instead of 'w'? REPL hangs on this line.
             named_pipes.add(named_pipe)
 
             # execute command on host, writing output to named pipe
             host.popen(command, stdout=named_pipe)
             print 'Writing output to named pipe', pipe_name
-        except KeyError: 
+        except KeyError:
             print 'Invalid virtual hostname', hostname
         except OSError:
             print 'Error creating named pipe.'
