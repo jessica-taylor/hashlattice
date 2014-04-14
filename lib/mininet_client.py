@@ -1,16 +1,21 @@
 import datetime
-import mininet
 import os
 import sys
 import tempfile
 
-PROMPT = 'HashLatticeMininet> '
+from mininet.topo import Topo, SingleSwitchTopo
+from mininet.net import Mininet
+from mininet.node import OVSController
+from mininet.util import dumpNodeConnections
+from mininet.log import setLogLevel
+
+PROMPT = 'HashLatticeMininet>'
 
 def main(argv):
     # The following is shamelessly lifted from https://github.com/mininet/mininet/wiki/Introduction-to-Mininet
     # TODO : generalize this to allow custom topologies
     topo = SingleSwitchTopo(3)
-    net = Mininet(topo)
+    net = Mininet(topo = topo, controller = OVSController)
     net.start()
     hosts = net.hosts
     # END shameless lifting
@@ -25,24 +30,28 @@ def main(argv):
 
         if len(user_in.split()) < 2:
             print 'Usage: <hostname> <command>'
+            continue
 
         hostname, command = user_in.split()[0], user_in.split()[1:]
 
         try:
-            if hostname[0] != 'h':
-                raise ValueError
+            # get host from provided hostname
+            host = net.get(hostname)
 
             # set up named pipe
             time_now = datetime.datetime.now()
-            pipe_name = os.path.join(tmpdir, ''.join('namedpipe-', time_now.strftime("%Y-%m-%d_%I:%M:%s.%f")))
+
+            pipe_name = os.path.join(tmpdir, ''.join(['namedpipe-', time_now.strftime("%Y-%m-%d_%I:%M:%s.%f")]))
             pipe_names.add(pipe_name)
+
             os.mkfifo(pipe_name)
             named_pipe = open(pipe_name, 'w')
             named_pipes.add(named_pipe)
 
-            hosts[int(hostname[1:])-1].popen(*command, stdout=named_pipe) # ashwins1: is it *command or just command?
+            # execute command on host, writing output to named pipe
+            host.popen(command, stdout=named_pipe)
             print 'Writing output to named pipe', pipe_name
-        except ValueError:
+        except KeyError: 
             print 'Invalid virtual hostname', hostname
         except OSError:
             print 'Error creating named pipe.'
