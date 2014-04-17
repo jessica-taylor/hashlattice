@@ -35,10 +35,14 @@ describe('Server', function() {
       });
     });
   });
+  var comp = {data: {x: 5}, code: 'x+1'};
+  var hash = Value.hashData(comp);
+  var value = 6;
+  var depComp = {data: {c: comp, h: hash}, 
+                 code: '[getHashData(h), evalComputation(c), getHash(h)]'};
+  var depHash = Value.hashData(depComp);
+  var depValue = [comp, value, value];
   describe('getHash', function() {
-    var comp = {data: {x: 5}, code: 'x+1'};
-    var hash = Value.hashData(comp);
-    var value = 6;
     it('should check hashEvalCache', function(done) {
       var s = new Server({
         hashEvalCache: new Cache.MemoryCache([[hash, value]])
@@ -55,7 +59,17 @@ describe('Server', function() {
       });
       s.getHash(hash, function(err, val) {
         assert(!err, err);
-        assert.equal(value, val);
+        assert(value, val);
+        done();
+      });
+    });
+    it('should evaluate dependent computations', function(done) {
+      var s = new Server({
+        hashDataCache: new Cache.MemoryCache([[hash, comp], [depHash, depComp]])
+      });
+      s.getHash(depHash, function(err, val) {
+        assert(!err, err);
+        assert(Value.valuesEqual(depValue, val));
         done();
       });
     });
@@ -88,6 +102,16 @@ describe('Server', function() {
       s.evalComputation(comp, function(err, val) {
         assert(!err, err);
         assert.equal(value, val);
+        done();
+      });
+    });
+    it('should evaluate dependent computations', function(done) {
+      var s = new Server({
+        hashDataCache: new Cache.MemoryCache([[hash, comp], [depHash, depComp]])
+      });
+      s.evalComputation(depComp, function(err, val) {
+        assert(!err, err);
+        assert(Value.valuesEqual(depValue, val));
         done();
       });
     });
