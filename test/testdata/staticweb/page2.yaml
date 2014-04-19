@@ -4,4 +4,6 @@ data:
   content: |
     <html><body><p>Here's another page!</p></body></html>
 code: |
-  {headers: headers, content: new Buffer(content, 'utf8')}
+  function(hl) { 
+    return {headers: headers, content: new Buffer(content, 'utf8')};
+  }
