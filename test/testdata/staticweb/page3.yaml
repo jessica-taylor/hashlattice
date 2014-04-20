@@ -1,0 +1,13 @@
+data:
+  headers:
+    "Content-Type": "text/html"
+  content: |
+    <html><body><p>Here's another page with an API!</p></body></html>
+code: |
+  function(hl) { 
+    return {headers: headers, 
+    content: new Buffer(content, 'utf8'),
+    api: { returnOne: function() { return 1; }
+        }
+    };
+  }
