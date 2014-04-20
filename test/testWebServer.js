@@ -60,16 +60,22 @@ Yaml.loadYamlFile('./test/testdata/staticweb/page1.yaml', function(err, comp1) {
                     function(res) {
                       // Put our other request in here so that we wait for the
                       // API object to be served
-                      http.get('http://127.0.0.1:1337/' + hash +
-                        '/_api/callFunction/0',
-                        function(res) {
-                          res.on('data', function(chunk) {
-                            assert.equal('1', chunk.toString('utf8'));
-                            done();
-                          });
-                      }).on('error', function(err) {
-                        assert(!err, err);    
+                      var reqOptions = {
+                        hostname: '127.0.0.1',
+                        port: 1337,
+                        path: '/' + hash + '/_api/callFunction/0',
+                        method: 'POST'
+                      }
+
+                      var req = http.request(reqOptions, function(res) {
+                        res.on('data', function(chunk) {
+                          assert.equal(1, Value.decodeValue(chunk));
+                          done();
+                        });
                       });
+
+                      req.write(Value.encodeValue([]));
+                      req.end();
                   });
                 });
               });
