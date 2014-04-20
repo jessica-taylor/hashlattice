@@ -52,9 +52,9 @@ def main(argv):
             host.popen(command, stdout=named_pipe)
             print pipe_name
         except KeyError:
-            print 'Invalid virtual hostname', hostname
+            sys.stderr.write('Invalid virtual hostname ' + hostname)
         except OSError:
-            print 'Error creating named pipe.'
+            sys.stderr.write('Error creating named pipe.')
 
     # clean up temp files
     for pipe in named_pipes:
