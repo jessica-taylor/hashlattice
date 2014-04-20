@@ -50,7 +50,7 @@ def main(argv):
 
             # execute command on host, writing output to named pipe
             host.popen(command, stdout=named_pipe)
-            print 'Writing output to named pipe', pipe_name
+            print pipe_name
         except KeyError:
             print 'Invalid virtual hostname', hostname
         except OSError:
