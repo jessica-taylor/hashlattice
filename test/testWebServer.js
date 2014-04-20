@@ -58,17 +58,18 @@ Yaml.loadYamlFile('./test/testdata/staticweb/page1.yaml', function(err, comp1) {
                 it('should serve API result', function(done) {
                   http.get('http://127.0.0.1:1337/' + hash + '/_api/apiObject',
                     function(res) {
-                      // Do nothing?
-                    });
-                  http.get('http://127.0.0.1:1337/' + hash +
-                    '/_api/callFunction/0',
-                    function(res) {
-                      res.on('data', function(chunk) {
-                        assert.equal('1', chunk.toString('utf8'));
-                        done();
+                      // Put our other request in here so that we wait for the
+                      // API object to be served
+                      http.get('http://127.0.0.1:1337/' + hash +
+                        '/_api/callFunction/0',
+                        function(res) {
+                          res.on('data', function(chunk) {
+                            assert.equal('1', chunk.toString('utf8'));
+                            done();
+                          });
+                      }).on('error', function(err) {
+                        assert(!err, err);    
                       });
-                  }).on('error', function(err) {
-                    assert(!err, err);    
                   });
                 });
               });
