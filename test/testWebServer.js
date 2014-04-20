@@ -6,7 +6,6 @@ var Server = require('../lib/server');
 var Value = require('../lib/value');
 var WebServer = require('../lib/webserver');
 var Yaml = require('../lib/yaml');
-var FunctionServer = require('../lib/functionserver');
 
 Yaml.loadYamlFile('./test/testdata/staticweb/page1.yaml', function(err, comp1) {
   assert(!err, err);
@@ -21,7 +20,6 @@ Yaml.loadYamlFile('./test/testdata/staticweb/page1.yaml', function(err, comp1) {
           assert(!err, err);
           server.putHash(comp3, function(err) {
             var webserver = new WebServer.WebServer(server);
-            var funcserver = new FunctionServer.FunctionServer();
             webserver.start(function() {
               describe('WebServer', function() {
                 it('should serve string content', function(done) {
@@ -57,13 +55,16 @@ Yaml.loadYamlFile('./test/testdata/staticweb/page1.yaml', function(err, comp1) {
                     assert(!err, err); 
                   });
                 });
-                it('should serve API', function(done) {
+                it('should serve API result', function(done) {
                   http.get('http://127.0.0.1:1337/' + hash + '/_api/apiObject',
                     function(res) {
+                      // Do nothing?
+                    });
+                  http.get('http://127.0.0.1:1337/' + hash +
+                    '/_api/callFunction/0',
+                    function(res) {
                       res.on('data', function(chunk) {
-                        var apiObj = funcserver.decodeValue(chunk);
-                        var returnOne = apiObj.returnOne;
-                        assert.equal(1, returnOne());
+                        assert.equal('1', chunk.toString('utf8'));
                         done();
                       });
                   }).on('error', function(err) {
