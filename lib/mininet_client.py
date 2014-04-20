@@ -13,12 +13,16 @@ PROMPT = 'HashLatticeMininet>'
 
 def main(argv):
     # The following is shamelessly lifted from https://github.com/mininet/mininet/wiki/Introduction-to-Mininet
+    # TODO: actually use settings
+    settings = raw_input();
     # TODO : generalize this to allow custom topologies
     topo = SingleSwitchTopo(3)
     net = Mininet(topo = topo, controller = OVSController)
     net.start()
     hosts = net.hosts
     # END shameless lifting
+
+    print ','.join([h.name + ' ' + h.IP() for h in hosts]);
 
     tmpdir = tempfile.mkdtemp()
     pipe_names = set()
