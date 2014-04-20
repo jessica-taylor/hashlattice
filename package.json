@@ -17,7 +17,8 @@
     "async": "0.7.x",
     "kadoh": "https://github.com/jinroh/kadoh/tarball/master",
     "mkdirp": "0.3.x",
-    "js-yaml": "3.0.x"
+    "js-yaml": "3.0.x",
+    "wait.for": "0.6.x"
   },
   "devDependencies": {
     "mocha": "x.x.x",
