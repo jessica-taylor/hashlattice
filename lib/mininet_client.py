@@ -14,7 +14,9 @@ PROMPT = 'HashLatticeMininet>'
 def main(argv):
     # The following is shamelessly lifted from https://github.com/mininet/mininet/wiki/Introduction-to-Mininet
     # TODO: actually use settings
+    print >> sys.stderr, 'awaiting input'
     settings = raw_input();
+    print >> sys.stderr, 'got input'
     # TODO : generalize this to allow custom topologies
     topo = SingleSwitchTopo(3)
     net = Mininet(topo = topo, controller = OVSController)
@@ -22,21 +24,25 @@ def main(argv):
     hosts = net.hosts
     # END shameless lifting
 
-    print ','.join([h.name + ' ' + h.IP() for h in hosts]);
+    print ','.join([h.name + ' ' + h.IP() for h in hosts])
+    sys.stdout.flush()
+    print >> sys.stderr, 'joined some stuff'
 
     tmpdir = tempfile.mkdtemp()
     pipe_names = set()
     named_pipes = set()
 
     while True:
-        print PROMPT,
+        # print PROMPT,
         user_in = raw_input()
+        print >> sys.stderr, 'got user input:', user_in
 
         if len(user_in.split()) < 2:
             print 'Usage: <hostname> <command>'
             continue
 
-        hostname, command = user_in.split()[0], user_in.split()[1:]
+        hostname = user_in.split()[0]
+        command = user_in[len(hostname) + 1:]
 
         try:
             # get host from provided hostname
@@ -49,12 +55,14 @@ def main(argv):
             pipe_names.add(pipe_name)
 
             os.mkfifo(pipe_name)
-            named_pipe = open(pipe_name, 'w') # maybe 'a' instead of 'w'? REPL hangs on this line.
+            named_pipe = open(pipe_name, 'w+')
             named_pipes.add(named_pipe)
 
             # execute command on host, writing output to named pipe
             host.popen(command, stdout=named_pipe)
             print pipe_name
+            print >> sys.stderr, 'printed pipe name'
+            sys.stdout.flush()
         except KeyError:
             sys.stderr.write('Invalid virtual hostname ' + hostname)
         except OSError:
