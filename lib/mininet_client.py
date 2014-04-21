@@ -57,9 +57,10 @@ def main(argv):
             named_pipe = open(pipe_name, 'w')
             print >> sys.stderr, 'opened pipe!'
             named_pipes.add(named_pipe)
+            print >> sys.stderr, 'popen', command
 
             # execute command on host, writing output to named pipe
-            host.popen(command, stdout=named_pipe)
+            host.popen(command, stdout=named_pipe, stderr=sys.stderr)
         except KeyError:
             sys.stderr.write('Invalid virtual hostname ' + hostname + '.\n')
         except OSError:
