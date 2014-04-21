@@ -2,6 +2,14 @@ import datetime
 import os
 import sys
 import tempfile
+import subprocess
+
+orig_popen = subprocess.Popen
+
+def hijack_popen(*args, **kwargs):
+  print >> sys.stderr, 'hijacked popen', args, kwargs
+  return orig_popen(*args, **kwargs)
+subprocess.Popen = hijack_popen
 
 from mininet.topo import Topo, SingleSwitchTopo
 from mininet.net import Mininet
@@ -10,6 +18,8 @@ from mininet.util import dumpNodeConnections
 from mininet.log import setLogLevel
 
 PROMPT = 'HashLatticeMininet>'
+
+
 
 def main(argv):
     # The following is shamelessly lifted from https://github.com/mininet/mininet/wiki/Introduction-to-Mininet
