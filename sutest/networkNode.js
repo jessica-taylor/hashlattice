@@ -16,17 +16,28 @@ var testKey = new Buffer('1234', 'hex');
 var testData = {a: 1, b: [4, 'hi', null, true, new Buffer('ffff', 'hex')]};
 
 if (isFirst) {
-  cache.put(testKey, testData, function(err) {
-    assert(!err, err);
-    console.log('done');
-    setTimeout(function() {
-      process.exit();
-    }, 1000);
-  });
+  function tryPut(tries) {
+    if (tries == 0) {
+      assert(false, 'no put tries left');
+    } else {
+      cache.put(testKey, testData, function(err) {
+        if (err == 'failed to store') {
+          setTimeout(function() { tryPut(tries - 1); }, 100);
+        } else {
+          assert(!err, err);
+          console.log('done');
+          setTimeout(function() {
+            process.exit();
+          }, 1000);
+        }
+      });
+    }
+  }
+  tryPut(20);
 } else {
   function tryGet(tries) {
     if (tries == 0) {
-      assert(false, 'no tries left');
+      assert(false, 'no get tries left');
     } else {
       cache.get(testKey, function(err, value) {
         if (err == 'not found') {
@@ -35,10 +46,14 @@ if (isFirst) {
           assert(!err, err);
           assert(Value.valuesEqual(testData, value));
           console.log('done');
+          setTimeout(function() {
+            process.exit();
+          }, 1000);
         }
       });
     }
   }
+  tryGet(20);
 }
 
 
