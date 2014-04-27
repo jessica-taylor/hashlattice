@@ -1,7 +1,7 @@
 var assert = require('assert');
 var http = require('http');
 
-var Cache = require('../lib/cache');
+var Store = require('../lib/store');
 var Server = require('../lib/server');
 var Value = require('../lib/value');
 var WebServer = require('../lib/webserver');

@@ -3,7 +3,7 @@ var Async = require('async');
 var _ = require('underscore');
 
 var Value = require('../lib/value');
-var Cache = require('../lib/cache');
+var Store = require('../lib/store');
 var Server = require('../lib/server').Server;
 var testDataValues = require('./testingUtil').testDataValues;
 
@@ -11,9 +11,9 @@ describe('Server', function() {
   describe('getHashData', function() {
     var value = [1, 2, {}];
     var hash = Value.hashData(value);
-    it('should check hashDataCache', function(done) {
+    it('should check hashDataStore', function(done) {
       var s = new Server({
-        hashDataCache: new Cache.MemoryCache([[hash, value]])
+        hashDataStore: new Store.MemoryStore([[hash, value]])
       });
       s.getHashData(hash, function(err, val) {
         assert(!err);
@@ -23,7 +23,7 @@ describe('Server', function() {
     });
     it('should report errors correctly', function(done) {
       var s = new Server({
-        hashDataCache: {
+        hashDataStore: {
           get: function(k, cb) {
             cb('asdf');
           }
@@ -43,9 +43,9 @@ describe('Server', function() {
   var depHash = Value.hashData(depComp);
   var depValue = [comp, value, value];
   describe('getHash', function() {
-    it('should check hashEvalCache', function(done) {
+    it('should check hashEvalStore', function(done) {
       var s = new Server({
-        hashEvalCache: new Cache.MemoryCache([[hash, value]])
+        hashEvalStore: new Store.MemoryStore([[hash, value]])
       });
       s.getHash(hash, function(err, val) {
         assert(!err, err);
@@ -55,7 +55,7 @@ describe('Server', function() {
     });
     it('should evaluate computations', function(done) {
       var s = new Server({
-        hashDataCache: new Cache.MemoryCache([[hash, comp]])
+        hashDataStore: new Store.MemoryStore([[hash, comp]])
       });
       s.getHash(hash, function(err, val) {
         assert(!err, err);
@@ -65,7 +65,7 @@ describe('Server', function() {
     });
     it('should evaluate dependent computations', function(done) {
       var s = new Server({
-        hashDataCache: new Cache.MemoryCache([[hash, comp], [depHash, depComp]])
+        hashDataStore: new Store.MemoryStore([[hash, comp], [depHash, depComp]])
       });
       s.getHash(depHash, function(err, val) {
         assert(!err, err);
@@ -85,9 +85,9 @@ describe('Server', function() {
     var comp = {data: {x: 5}, code: 'x+1'};
     var hash = Value.hashData(comp);
     var value = 6;
-    it('should check hashEvalCache', function(done) {
+    it('should check hashEvalStore', function(done) {
       var s = new Server({
-        hashEvalCache: new Cache.MemoryCache([[hash, value]])
+        hashEvalStore: new Store.MemoryStore([[hash, value]])
       });
       s.evalComputation(comp, function(err, val) {
         assert(!err, err);
@@ -97,7 +97,7 @@ describe('Server', function() {
     });
     it('should evaluate computations', function(done) {
       var s = new Server({
-        hashDataCache: new Cache.MemoryCache([[hash, comp]])
+        hashDataStore: new Store.MemoryStore([[hash, comp]])
       });
       s.evalComputation(comp, function(err, val) {
         assert(!err, err);
@@ -107,7 +107,7 @@ describe('Server', function() {
     });
     it('should evaluate dependent computations', function(done) {
       var s = new Server({
-        hashDataCache: new Cache.MemoryCache([[hash, comp], [depHash, depComp]])
+        hashDataStore: new Store.MemoryStore([[hash, comp], [depHash, depComp]])
       });
       s.evalComputation(depComp, function(err, val) {
         assert(!err, err);
