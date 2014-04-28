@@ -14,11 +14,11 @@ Yaml.loadYamlFile('./test/testdata/staticweb/page1.yaml', function(err, comp1) {
     Yaml.loadYamlFile('./test/testdata/staticweb/page3.yaml', function(err, 
         comp3) {
       var server = new Server.Server();
-      server.putHash(comp1, function(err) {
+      server.putHashData(comp1, function(err) {
         assert(!err, err);
-        server.putHash(comp2, function(err) {
+        server.putHashData(comp2, function(err) {
           assert(!err, err);
-          server.putHash(comp3, function(err) {
+          server.putHashData(comp3, function(err) {
             var webserver = new WebServer.WebServer(server);
             webserver.start(function() {
               describe('WebServer', function() {

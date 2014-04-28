@@ -116,13 +116,13 @@ describe('Server', function() {
       });
     });
   });
-  describe('putHash', function() {
+  describe('putHashData', function() {
     it('should insert data so it can be gotten', function(done) {
       var s = new Server();
       var comp = {data: {x: 5}, code: 'x+1'};
       var hash = Value.hashData(comp);
       var value = 6;
-      s.putHash(comp, function(err) {
+      s.putHashData(comp, function(err) {
         assert(!err, err);
         s.getHash(hash, function(err, result) {
           assert(!err, err);
