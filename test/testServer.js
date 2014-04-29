@@ -13,7 +13,7 @@ describe('Server', function() {
     var hash = Value.hashData(value);
     it('should check hashDataStore', function(done) {
       var s = new Server({
-        hashDataStore: new Store.MemoryStore([[hash, value]])
+        hashDataStore: new Store.CheckingHashStore(new Store.MemoryStore([[hash, value]]))
       });
       s.getHashData(hash, function(err, val) {
         assert(!err);
@@ -24,7 +24,7 @@ describe('Server', function() {
     it('should report errors correctly', function(done) {
       var s = new Server({
         hashDataStore: {
-          get: function(k, cb) {
+          getHashData: function(k, cb) {
             cb('asdf');
           }
         }
@@ -55,7 +55,7 @@ describe('Server', function() {
     });
     it('should evaluate computations', function(done) {
       var s = new Server({
-        hashDataStore: new Store.MemoryStore([[hash, comp]])
+        hashDataStore: new Store.CheckingHashStore(new Store.MemoryStore([[hash, comp]]))
       });
       s.getHash(hash, function(err, val) {
         assert(!err, err);
@@ -65,7 +65,7 @@ describe('Server', function() {
     });
     it('should evaluate dependent computations', function(done) {
       var s = new Server({
-        hashDataStore: new Store.MemoryStore([[hash, comp], [depHash, depComp]])
+        hashDataStore: new Store.CheckingHashStore(new Store.MemoryStore([[hash, comp], [depHash, depComp]]))
       });
       s.getHash(depHash, function(err, val) {
         assert(!err, err);
@@ -97,7 +97,7 @@ describe('Server', function() {
     });
     it('should evaluate computations', function(done) {
       var s = new Server({
-        hashDataStore: new Store.MemoryStore([[hash, comp]])
+        hashDataStore: new Store.CheckingHashStore(new Store.MemoryStore([[hash, comp]]))
       });
       s.evalComputation(comp, function(err, val) {
         assert(!err, err);
@@ -107,7 +107,7 @@ describe('Server', function() {
     });
     it('should evaluate dependent computations', function(done) {
       var s = new Server({
-        hashDataStore: new Store.MemoryStore([[hash, comp], [depHash, depComp]])
+        hashDataStore: new Store.CheckingHashStore(new Store.MemoryStore([[hash, comp], [depHash, depComp]]))
       });
       s.evalComputation(depComp, function(err, val) {
         assert(!err, err);
