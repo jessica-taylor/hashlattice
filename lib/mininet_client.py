@@ -22,7 +22,7 @@ def main(argv):
     hosts = net.hosts
     # END shameless lifting
 
-    print ','.join([h.name + ' ' + h.IP() for h in hosts])
+    # print ','.join([h.name + ' ' + h.IP() for h in hosts])
     sys.stdout.flush()
 
     tmpdir = tempfile.mkdtemp()
