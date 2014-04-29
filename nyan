@@ -1,2 +1,2 @@
 #!/bin/sh
-node_modules/.bin/mocha -R nyan
+node_modules/.bin/mocha --recursive -R nyan
