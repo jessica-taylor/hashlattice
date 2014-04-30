@@ -1,4 +1,5 @@
 
+var assert = require('assert');
 var Async = require('async');
 var _ = require('underscore');
 
