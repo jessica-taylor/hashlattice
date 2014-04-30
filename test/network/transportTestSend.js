@@ -6,13 +6,18 @@ function printUsage() {
 
 if (process.argv.length != 4) {
   printUsage();
-  exit();
+  process.exit();
 }
 
 var udpTransport = new Transport.UdpTransport();
 
 var targetVirtualIP   = process.argv[2];
-var targetVirtualPort = process.argv[3];
+var targetVirtualPort = parseInt(process.argv[3]);
+
+if (targetVirtualPort === NaN) {
+  printUsage();
+  process.exit();
+}
 
 udpTransport.serverStart(
   function(reqObj, cb) {
