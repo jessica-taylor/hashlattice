@@ -1,2 +1,6 @@
-#!/bin/sh
-node_modules/.bin/mocha --require longjohn $@ `find test -name 'test*.js'`
+#!/bin/bash
+paths=test
+if [ "$(id -u)" == "0" ]; then
+  paths='sutest test'
+fi
+node_modules/.bin/mocha --require longjohn $@ `find $paths -name 'test*.js'`

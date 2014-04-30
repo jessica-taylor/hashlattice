@@ -2,8 +2,8 @@ var assert = require('assert');
 var Async = require('async');
 var _ = require('underscore');
 
-var Transport = require('../../lib/network/transport');
-var Mininet = require('../../lib/mininet');
+var Transport = require('../lib/network/transport');
+var Mininet = require('../lib/mininet');
 
 describe('Transport', function() {
   describe('startServer', function() {
