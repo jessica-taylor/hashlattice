@@ -9,7 +9,7 @@ describe('Transport', function() {
   describe('startServer', function() {
     var mn = new Mininet();
     it('should start the UDP transport layer correctly', function (done) {
-      mn.runCommand(1, 'node ./testTransportStartServer');
+      mn.runCommand(1, 'node ./transportTestStartServer');
       done();
     });
   });
@@ -18,7 +18,7 @@ describe('Transport', function() {
     it('should send messages correctly', function (done) {
       mn.getIP(2, function(err, targetIP) {
         // FIXME : how do we determine the port to send to in this test?
-        mn.runCommand(1, 'node ../testTransportSend ' + targetIP + ' 13337');
+        mn.runCommand(1, 'node ./transportTestSend ' + targetIP + ' 13337');
         done();
       })
     });
