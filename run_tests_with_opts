@@ -1,2 +1,2 @@
 #!/bin/sh
-node_modules/.bin/mocha $@ `find test -name 'test*.js'`
+node_modules/.bin/mocha --require longjohn $@ `find test -name 'test*.js'`
