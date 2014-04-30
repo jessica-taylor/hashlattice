@@ -1,4 +1,4 @@
-var Transport = require('../../lib/network/transport');
+var Transport = require('../lib/network/transport');
 
 var udpTransport = new Transport.UdpTransport();
 udpTransport.startServer(

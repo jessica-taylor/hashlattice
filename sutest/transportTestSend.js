@@ -1,4 +1,4 @@
-var Transport = require('../../lib/network/transport');
+var Transport = require('../lib/network/transport');
 
 function printUsage() {
   console.warn('Usage: node testTransportSend <target virtual IP> <target virtual port>');
