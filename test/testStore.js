@@ -20,7 +20,7 @@ function assertValuesEqual(store, keys, values, callback) {
       if (err == 'not found') {
         assert(!(key in values), 'key ' + key + ' not found, but should');
       } else {
-        assert(!err);
+        assert(!err, err);
         assert(Value.valuesEqual(value, values[key]));
       }
       cb();
@@ -28,7 +28,7 @@ function assertValuesEqual(store, keys, values, callback) {
   }, function() { callback(); });
 }
 
-function testStore(store, initialValues) {
+function testValueStore(store, initialValues) {
   var initialKeys = _.keys(initialValues);
   var testKeys = _.keys(testValues);
   var allKeys = _.union(initialKeys, testKeys);
@@ -52,15 +52,19 @@ var testInitValues = {
   '123455': {'a': 5, 'b': [false, {}]}
 };
 
+function mapToMemoryStore(values) {
+  var initValuesPairs = _.map(_.pairs(values), function(kv) {
+    return [new Buffer(kv[0], 'hex'), kv[1]];
+  });
+  return new Store.MemoryStore(initValuesPairs);
+}
+
 describe('MemoryStore', function() {
   describe('empty', function() {
-    testStore(new Store.MemoryStore(), {});
+    testValueStore(new Store.MemoryStore(), {});
   });
   describe('initialized', function() {
-    var initValuesPairs = _.map(_.pairs(testInitValues), function(kv) {
-      return [new Buffer(kv[0], 'hex'), kv[1]];
-    });
-    testStore(new Store.MemoryStore(initValuesPairs), testInitValues);
+    testValueStore(mapToMemoryStore(testInitValues), testInitValues);
   });
 });
 
@@ -69,10 +73,23 @@ mkdirp(dir, function(err) {
   assert(!err, err);
   describe('FileStore', function() {
     describe('empty', function() {
-      testStore(new Store.FileStore(dir), {});
+      testValueStore(new Store.FileStore(dir), {});
     });
     describe('initialized', function() {
-      testStore(new Store.FileStore(dir), testValues);
+      testValueStore(new Store.FileStore(dir), testValues);
     });
   });
 });
+
+describe('LayeredValueStore', function() {
+  var store1values = testInitValues;
+  var store2values = {
+    'ba56': true,
+    'abcdef': 'not null'
+  };
+  var store1 = mapToMemoryStore(store1values);
+  var store2 = mapToMemoryStore(store2values);
+  var layered = new Store.LayeredValueStore(store1, store2);
+  testValueStore(layered, _.extend(_.clone(store2values), store1values));
+});
+
