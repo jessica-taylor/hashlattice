@@ -5,7 +5,7 @@ var mkdirp = require('mkdirp');
 var _ = require('underscore');
 
 var Value = require('../lib/value');
-var Cache = require('../lib/cache');
+var Store = require('../lib/store');
 
 var testValues = {
   'af56': 5,
@@ -14,9 +14,9 @@ var testValues = {
   '1234': {'a': 5, 'b': [false, {}]}
 };
 
-function assertValuesEqual(cache, keys, values, callback) {
+function assertValuesEqual(store, keys, values, callback) {
   Async.map(keys, function(key, cb) {
-    cache.get(new Buffer(key, 'hex'), function(err, value) {
+    store.get(new Buffer(key, 'hex'), function(err, value) {
       if (err == 'not found') {
         assert(!(key in values), 'key ' + key + ' not found, but should');
       } else {
@@ -28,19 +28,19 @@ function assertValuesEqual(cache, keys, values, callback) {
   }, function() { callback(); });
 }
 
-function testCache(cache, initialValues) {
+function testStore(store, initialValues) {
   var initialKeys = _.keys(initialValues);
   var testKeys = _.keys(testValues);
   var allKeys = _.union(initialKeys, testKeys);
   it('should initially contain only initial values', function(done) {
-    assertValuesEqual(cache, allKeys, initialValues, done);
+    assertValuesEqual(store, allKeys, initialValues, done);
   });
   it('should contain the union of values after putting', function(done) {
     Async.map(testKeys, function(key, cb) { 
-      cache.put(new Buffer(key, 'hex'), testValues[key], cb);
+      store.put(new Buffer(key, 'hex'), testValues[key], cb);
     }, function(err) {
       assert(!err);
-      assertValuesEqual(cache, allKeys, _.extend(_.clone(initialValues), testValues), done);
+      assertValuesEqual(store, allKeys, _.extend(_.clone(initialValues), testValues), done);
     });
   });
 }
@@ -52,27 +52,27 @@ var testInitValues = {
   '123455': {'a': 5, 'b': [false, {}]}
 };
 
-describe('MemoryCache', function() {
+describe('MemoryStore', function() {
   describe('empty', function() {
-    testCache(new Cache.MemoryCache(), {});
+    testStore(new Store.MemoryStore(), {});
   });
   describe('initialized', function() {
     var initValuesPairs = _.map(_.pairs(testInitValues), function(kv) {
       return [new Buffer(kv[0], 'hex'), kv[1]];
     });
-    testCache(new Cache.MemoryCache(initValuesPairs), testInitValues);
+    testStore(new Store.MemoryStore(initValuesPairs), testInitValues);
   });
 });
 
 var dir = '/tmp/hashlattice_test_' + Math.random();
 mkdirp(dir, function(err) {
   assert(!err, err);
-  describe('FileCache', function() {
+  describe('FileStore', function() {
     describe('empty', function() {
-      testCache(new Cache.FileCache(dir), {});
+      testStore(new Store.FileStore(dir), {});
     });
     describe('initialized', function() {
-      testCache(new Cache.FileCache(dir), testValues);
+      testStore(new Store.FileStore(dir), testValues);
     });
   });
 });
