@@ -1,2 +1,2 @@
 #!/bin/sh
-node_modules/.bin/mocha --recursive -R nyan
+./run_tests_with_opts -R nyan

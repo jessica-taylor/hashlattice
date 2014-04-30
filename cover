@@ -1,2 +1,2 @@
 #!/bin/sh
-node_modules/.bin/istanbul cover node_modules/.bin/_mocha -- --recursive -R nyan && xdg-open coverage/lcov-report/index.html
+node_modules/.bin/istanbul cover node_modules/.bin/_mocha -- -R nyan `find test -name '*.js'` && xdg-open coverage/lcov-report/index.html
