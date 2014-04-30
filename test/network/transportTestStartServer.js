@@ -1,6 +1,7 @@
 var Transport = require('../../lib/network/transport');
 
-var udpServer = Transport.serverStart(
+var udpTransport = new UdpTransport();
+udpTransport.serverStart(
   function(reqObj, cb) {
     console.log('Hark, a request object!');
     console.log(reqObj);
