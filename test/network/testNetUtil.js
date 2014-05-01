@@ -40,12 +40,12 @@ describe('netutil', function() {
         });
   });
   describe('uniquePeers', function() {
+    var node1 = new Node();
+    var peer1 = new Peer(node1, {ip: '175.45.176.0', port: '1337' });
+    var node2 = new Node();
+    var peer2 = new Peer(node2, {ip: '127.0.0.1', port: '1337'});
     it('should return a list of peers of length 2, erasing one of the ' + 
        'copied peers', function() {
-        var node1 = new Node();
-        var peer1 = new Peer(node1, {ip: '175.45.176.0', port: '1337' });
-        var node2 = new Node();
-        var peer2 = new Peer(node2, {ip: '127.0.0.1', port: '1337'});
         var peers = [peer1, peer2, peer2]
         var newPeers = NetUtil.uniquePeers(peers);
         assert.equal(2, newPeers.length);
@@ -56,5 +56,29 @@ describe('netutil', function() {
         assert(_.contains(newPeerIps, '175.45.176.0'));
         assert(_.contains(newPeerIps, '127.0.0.1'));
     });
+    it('should return a list of peers of length 2, not modifying the ' +
+       'peers', function() {
+        var peers = [peer1, peer2];
+        var newPeers = NetUtil.uniquePeers(peers);
+        var newPeerIps = []
+        for (var i = 0; i < newPeers.length; i++) {
+          newPeerIps.push(newPeers[i].getSpec().ip);
+        }
+        assert(_.contains(newPeerIps, '175.45.176.0'));
+        assert(_.contains(newPeerIps, '127.0.0.1'));
+    });
+  });
+  describe('sortPeersByDistance', function() {
+    var node1 = new Node();
+    var peer1 = new Peer(node1, {ip: '175.45.176.0', port: '1337' });
+    var node2 = new Node();
+    var peer2 = new Peer(node2, {ip: '127.0.0.1', port: '1337'});
+    var peer1Hash = peer1.getID();
+    var peers = [peer2, peer1];
+    it('should return a list with peer2 first, peer1 second', function() {
+      var sortedPeers = NetUtil.sortPeersByDistance(peer1Hash, peers);
+      assert.equal('175.45.176.0', sortedPeers[0].getSpec().ip);
+    });
+
   });
 });
