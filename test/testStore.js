@@ -131,5 +131,14 @@ describe('CheckingHashStore', function() {
     new Store.CheckingHashStore(new Store.MemoryStore(
         _.map(initialValues, function(v) { return [Value.hashData(v), v]; }))),
     initialValues);
+  it('should report invalid items in the store', function(done) {
+    var badhash = new Buffer('cafe', 'hex');
+    var store = new Store.CheckingHashStore(new Store.MemoryStore(
+        [[badhash, 5]]));
+    store.getHashData(badhash, function(err, value) {
+      assert(err);
+      done();
+    });
+  });
 });
 
