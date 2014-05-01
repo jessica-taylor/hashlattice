@@ -93,3 +93,43 @@ describe('LayeredValueStore', function() {
   testValueStore(layered, _.extend(_.clone(store2values), store1values));
 });
 
+function assertHashValuesEqual(store, allValues, initialValues, callback) {
+  var initHashes = _.map(allValues, function(v) { return Value.hashData.toString('hex'); });
+  Async.map(allValues, function(v, cb) {
+    var vhash = Value.hashData(v);
+    store.getHashData(vhash, function(err, value) {
+      if (err == 'not found') {
+        assert(!_.contains(initHashes, vhash.toString('hex')));
+      } else {
+        assert(!err, err);
+        assert(Value.valuesEqual(v, value));
+      }
+      cb();
+    });
+  }, function() { callback(); });
+}
+
+function testHashStore(store, initialValues) {
+  var allValues = _.values(testValues).concat(initialValues);
+  it('should initially contain only initial values', function(done) {
+    assertHashValuesEqual(store, allValues, initialValues, done);
+  });
+  it('should contain the union of values after putting', function(done) {
+    Async.map(testValues, function(v, cb) {
+      store.putHashData(v, cb);
+    }, function(err) {
+      assert(!err);
+      assertHashValuesEqual(store, allValues, allValues, done);
+    });
+  });
+}
+
+
+describe('CheckingHashStore', function() {
+  var initialValues = [1, {a: 'b'}, true];
+  testHashStore(
+    new Store.CheckingHashStore(new Store.MemoryStore(
+        _.map(initialValues, function(v) { return [Value.hashData(v), v]; }))),
+    initialValues);
+});
+
