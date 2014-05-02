@@ -57,8 +57,6 @@ describe('Node', function() {
       var peerSpecs = generatePeerSpecs(20, 2);
       var network = new MockNetwork(peerSpecs);
       var value = [1, false, null, {x: new Buffer('cafe', 'hex')}]
-      console.log('node1', network.transports[0].spec);
-      console.log('node2', network.transports[1].spec);
       var node1 = new Node({
         transport: network.transports[0],
         bootstraps: [network.transports[1].spec]
@@ -69,7 +67,6 @@ describe('Node', function() {
       });
       Async.parallel([_.bind(node1.startServer, node1), _.bind(node2.startServer, node2)], function() {
         node1.putHashData(value, function(err) {
-          console.log('finished putHashData');
           assert(!err, err);
           node2.getHashData(Value.hashData(value), function(err, gotValue) {
             assert(!err, err);
