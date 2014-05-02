@@ -19,7 +19,8 @@
     "mkdirp": "0.3.x",
     "js-yaml": "3.0.x",
     "wait.for": "0.6.x",
-    "carrier": "0.1.x"
+    "carrier": "0.1.x",
+    "rwlock": "4.0.x"
   },
   "devDependencies": {
     "mocha": "x.x.x",
