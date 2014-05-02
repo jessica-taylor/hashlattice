@@ -36,6 +36,8 @@ MockTransport.prototype.startServer = function(handler, callback) {
 };
 
 MockTransport.prototype.request = function(ip, port, reqObj, callback) {
+  console.log('request', ip, port, reqObj, callback);
+  assert(callback);
   var self = this;
   var peerTransport = self.network.transportForPeer(ip, port);
   // TODO: randomly fail?
