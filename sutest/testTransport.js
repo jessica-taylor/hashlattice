@@ -18,10 +18,18 @@ describe('Transport', function() {
   describe('sendMessage', function() {
     var mn = new Mininet('tree,5');
     it('should send messages correctly', function (done) {
-      mn.getIP(2, function(err, targetIP) {
-        // FIXME : how do we determine the port to send to in this test?
-        mn.runCommand(1, 'node ' + Path.join(__dirname, 'transportTestSend') + ' ' + targetIP + ' 13337');
-        done();
+      mn.getIP(2, function(err, destIP) {
+        if (err) {
+          done('Error while retrieving destination IP');
+        } else {
+          mn.getPort(2, function(err, destPort) {
+            if (err) {
+              done('Error while retrieving destination port');
+            }
+            mn.runCommand(1, 'node ' + Path.join(__dirname, 'transportTestSend') + ' ' + destIP + ' ' + destPort);
+            done();
+          });
+        }
       })
     });
   });
