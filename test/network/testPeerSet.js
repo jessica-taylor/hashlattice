@@ -55,4 +55,10 @@ describe('peerset', function() {
     }
     assert(_.contains(peerIps, '1.1.1.1'));
   });
+  it('should only return 1 peer -- no duplicates', function() {
+    var psetWithOrigin = new PeerSet({origin: peer1.getID()});
+    psetWithOrigin.insert(peer2);
+    psetWithOrigin.insert(peer2);
+    assert.equal(1, psetWithOrigin.allPeers().length); 
+  });
 });
