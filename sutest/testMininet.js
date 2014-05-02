@@ -1,7 +1,5 @@
 var assert = require('assert');
 
-var wait = require('wait.for');
-
 var Mininet = require('../lib/mininet');
 
 
