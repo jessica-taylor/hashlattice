@@ -40,13 +40,13 @@ MockTransport.prototype.request = function(ip, port, reqObj, callback) {
   var peerTransport = self.network.transportForPeer(ip, port);
   // TODO: randomly fail?
   if (!peerTransport) {
-    callback(null, {error: 'timeout'});
+    process.nextTick(function() { callback(null, {error: 'timeout'}); });
   } else {
     reqObj = _.clone(reqObj);
     reqObj.sender = self.spec;
     peerTransport.handler(reqObj, function(err, resp) {
       assert(!err, err);
-      callback(null, resp);
+      process.nextTick(function() { callback(null, resp); });
     });
   }
 };
