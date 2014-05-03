@@ -27,5 +27,5 @@ udpTransport.serverStart(
   },
   function (err, data) {
   });
-udpTransport.sendMessage(targetVirtualIP, targetVirtualPort, 'hi there');
+udpTransport.sendMessage({ip: targetVirtualIP, port: targetVirtualPort}, 'hi there');
 // TODO : how do we confirm that this message was actually sent and received?

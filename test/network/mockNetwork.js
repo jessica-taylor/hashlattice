@@ -10,10 +10,10 @@ function MockNetwork(peerSpecs) {
   self.transports = peerSpecs.map(function(peer) { return new MockTransport(self, peer); });
 }
 
-MockNetwork.prototype.transportForPeer = function(ip, port) {
+MockNetwork.prototype.transportForPeer = function(peer) {
   var self = this;
   for (var i = 0; i < self.peerSpecs.length; i++) {
-    if (self.peerSpecs[i].ip == ip && self.peerSpecs[i].port == port) {
+    if (self.peerSpecs[i].ip == peer.ip && self.peerSpecs[i].port == peer.port) {
       return self.transports[i];
     }
   }
@@ -35,10 +35,10 @@ MockTransport.prototype.startServer = function(handler, callback) {
   process.nextTick(callback);
 };
 
-MockTransport.prototype.request = function(ip, port, reqObj, callback) {
+MockTransport.prototype.request = function(peer, reqObj, callback) {
   assert(callback);
   var self = this;
-  var peerTransport = self.network.transportForPeer(ip, port);
+  var peerTransport = self.network.transportForPeer(peer);
   // TODO: randomly fail?
   if (!peerTransport) {
     process.nextTick(function() { callback(null, {error: 'timeout'}); });
