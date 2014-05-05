@@ -21,15 +21,11 @@ if (targetVirtualPort === NaN) {
   process.exit();
 }
 
-console.warn('starting up');
 udpTransport.startServer(
   function(reqObj, cb) {
-    console.log('Hark, a request object!');
-    console.log(reqObj);
     cb();
   },
   function (err) {
-    console.warn('started up the serverrr');
     assert(!err, err);
     udpTransport.request({ip: targetVirtualIP, port: targetVirtualPort}, 'hi there', function(err, respObj) {
       assert(!err, err);
@@ -38,4 +34,4 @@ udpTransport.startServer(
       process.exit(0);
     });
   });
-// TODO : how do we confirm that this message was actually sent and received?
+setTimeout(process.exit, 2000);

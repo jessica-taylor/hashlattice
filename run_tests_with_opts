@@ -2,5 +2,7 @@
 paths=test
 if [ "$(id -u)" == "0" ]; then
   paths='sutest test'
+  killall ovs-controller
+  killall mn
 fi
 node_modules/.bin/mocha --require longjohn $@ `find $paths -name 'test*.js'`
