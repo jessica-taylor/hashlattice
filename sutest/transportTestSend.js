@@ -1,3 +1,5 @@
+var assert = require('assert');
+
 var Transport = require('../lib/network/transport');
 
 function printUsage() {
@@ -21,11 +23,15 @@ if (targetVirtualPort === NaN) {
 
 udpTransport.startServer(
   function(reqObj, cb) {
-    console.log('Hark, a request object!');
-    console.log(reqObj);
     cb();
   },
-  function (err, data) {
+  function (err) {
+    assert(!err, err);
+    udpTransport.request({ip: targetVirtualIP, port: targetVirtualPort}, 'hi there', function(err, respObj) {
+      assert(!err, err);
+      assert.equal('hello to you too', respObj);
+      console.log('done');
+      process.exit(0);
+    });
   });
-udpTransport.sendMessage(targetVirtualIP, targetVirtualPort, 'hi there');
-// TODO : how do we confirm that this message was actually sent and received?
+setTimeout(process.exit, 2000);

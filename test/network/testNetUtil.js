@@ -79,6 +79,5 @@ describe('netutil', function() {
       var sortedPeers = NetUtil.sortPeersByDistance(peer1Hash, peers);
       assert.equal('175.45.176.0', sortedPeers[0].getSpec().ip);
     });
-
   });
 });

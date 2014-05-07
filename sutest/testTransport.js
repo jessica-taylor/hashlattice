@@ -4,39 +4,31 @@ var assert = require('assert');
 var Async = require('async');
 var _ = require('underscore');
 
+var Utilities = require('../lib/utilities');
 var Transport = require('../lib/network/transport');
 var Mininet = require('../lib/mininet');
 
 describe('Transport', function() {
-  describe('startServer', function() {
-    var mn = new Mininet();
-    it('should start the UDP transport layer correctly', function (done) {
-      mn.runCommand(1, 'node ' + Path.join(__dirname, 'transportTestStartServer'));
-      done();
+  describe('request', function() {
+    var mn = new Mininet('linear,2');
+    after(function() {
+      mn.close();
     });
-  });
-  describe('sendMessage', function() {
-    var mn = new Mininet('tree,5');
     it('should send messages correctly', function (done) {
+      this.timeout(5000);
       mn.getIP(2, function(err, destIP) {
         if (err) {
-          done('Error while retrieving destination IP');
+          done(err);
         } else {
-          mn.getPort(2, function(err, destPort) {
-            if (err) {
-              done('Error while retrieving destination port');
-            }
-            mn.runCommand(1, 'node ' + Path.join(__dirname, 'transportTestSend') + ' ' + destIP + ' ' + destPort);
+          var sender = mn.runCommand(1, 'node ' + Path.join(__dirname, 'transportTestSend') + ' ' + destIP + ' ' + 13337);
+          var receiver = mn.runCommand(2, 'node ' + Path.join(__dirname, 'transportTestReceive'));
+          Utilities.readAllFromStream(sender, function(err, data) {
+            assert(!err, err);
+            assert.equal('done\n', data.toString('utf8'));
             done();
           });
         }
       })
-    });
-  });
-  describe('request', function() {
-    it('should send requests correctly, building on sendMessage', function (done) {
-      // TODO : finish this test; mn.runCommand(herpderp);
-      done();
     });
   });
 });

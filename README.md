@@ -38,15 +38,15 @@ Using `eval()` like this is inconvenient.  This is why HashLattice allows comput
 
 Functions make it easy to interface HashLattice with programming languages.  Most scripting languages (including Javascript, Python, Ruby, and Perl) have an easy way to represent values, and other languages (such as Java and C++) can represent them with a bit more difficulty.  Therefore, it is possible to provide a library that can be used like this:
 
-        import paos
-        lib = paos.getFromHash('<sha256 hash code>')
+        import hl 
+        lib = hl.getFromHash('<sha256 hash code>')
         lib.function(5)
 
 This will often be much easier than installing language-specific libraries, which may or may not even exist.  Since HashLattice includes dependency management, it can be used like a package manager for Javascript code that can be called from many different languages.  The HashLattice package provided to the host language can call an external process to handle function calls.
 
 ### User Interface
 
-In addition to a shell and programming language integration, HashLattice will have web browser integration in the form of a browser extension.  When a URL of the form `paos://<hash>` is visited, the browser downloads a data value corresponding to the given hash and interprets it as an HTML page.  The page may be downloaded from peers in the network; no central web server is necessary.  The Javascript on the HTML page will be able to access HashLattice functions such as retrieving documents from their hash value.  With user permission, it will be able to put data in the system.  This enables easy distribution of applications that work with HashLattice: simply distribute the hash of a computation returning the application's HTML page.  Obviously, it is also possible for the browser to display file types other than HTML.
+When a URL of the form `http://127.0.0.1:<port>/<hash>` is visited, the browser downloads a data value corresponding to the given hash and interprets it as an HTML page.  The page may be downloaded from peers in the network; no central web server is necessary.  The Javascript on the HTML page will be able to access HashLattice functions such as retrieving documents from their hash value.  With user permission, it will be able to put data in the system.  This enables easy distribution of applications that work with HashLattice: simply distribute the hash of a computation returning the application's HTML page.  Obviously, it is also possible for the browser to display file types other than HTML.
 
 ### Variables
 
@@ -72,7 +72,12 @@ Surprisingly, Bitcoin can also be implemented using variables.  The block chain 
 
 ### Data
 
-The main data type of HashLattice is a variant of JSON.  It is exactly like JSON, except that it also contains byte arrays as a data type.  Also, data can be binary encoded, similar to BSON.  Perhaps it would be good to simply use a subset of BSON.
+The main data type of HashLattice is a variant of YAML.  It is exactly like
+YAML, except that it supports some nice template features for including other
+files. These template features are !includeYaml for including another YAML
+file, !hashYaml for including the hash code of another YAML file,
+!includeBinary for including binary data in the YAML, and !hashBinary for
+including the hash code of a binary file.
 
 ### Code
 
@@ -87,18 +92,31 @@ The intention is that it's as close to a purely functional programming language 
 
 ### Computations
 
-A *computation* is some Javascript code that produces a value and can access a few functions that are guaranteed to be deterministic.  Specifically, the form of the computation is data:
+A *computation* is a YAML file that produces a value and can access a few functions that are guaranteed to be deterministic.  Specifically, the form of the computation is data:
 
-    {'data': {
-        // a mapping from variable name to data
-     },
-     (optional) 'cache': // boolean of whether to cache this computation
-     'code': '// a Javascript expression that can use data variables and some functions'
-    }
+    data: 
+      pages:
+        index.html: |
+          (include index.html here via having the code or a !includeBinary)
+        image.png: |
+          !includeBinary ./image.png
+    code: |
+      function(hl) {
+        // retrieve the path from hl and return a Javascript object containing
+        // 3 elements here: headers, api (an API specified for individual
+        // sites), and content
+      }
+    // TODO we still need to standardize this.... a few issues come to mind:
+    // 1. where do we put the headers if we format the data like "pages" above?
+    // 2. can we still just specify one file in the data section (no "pages"
+    // section)?
+    // 3. we should mock up an example of what variables look like in yaml
+    // files. I understand we have a varhash section that refers to the hash of
+    // the variable, but I'm not sure what the yaml file the !hashYaml
+    // statement is referring to looks like
+    
 
 Every computation produces a deterministic result when evaluated.  The code is allowed to call a `evalComputation(comp)` function, which takes a computation and returns its evaluation.
-
-If the `cache` boolean is set to true, then the system will attempt to cache the result of this computation.  The result of the computation must be data for this to work.
 
 ### Hash codes
 
@@ -108,6 +126,7 @@ The main hash function used in HashLattice is SHA256.  It is possible to find th
 
 A variable is an object of the following form:
 
+    // TODO update this for YAML?
     {'merge': function(current, next) {
        // current and next are both data values corresponding to the variable
        // we already have current as our value, and just heard about next

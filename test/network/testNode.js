@@ -35,6 +35,7 @@ function randUnique(gen, n) {
       used[val] = true;
     }
   }
+  return vals;
 }
 
 function generatePeerSpecs(numIPs, numPorts) {
@@ -45,23 +46,33 @@ function generatePeerSpecs(numIPs, numPorts) {
   }), true);
 }
 
+function selectBootstraps(peerSpecs, nbootstraps) {
+  var indices = randUnique(function() { return randRange(peerSpecs.length); }, nbootstraps);
+  return _.map(indices, function(i) { return peerSpecs[i]; });
+}
+
 describe('Node', function() {
   describe('putHashData', function() {
     it('should put values that can be gotten from other nodes', function(done) {
-      var network = new MockNetwork(generatePeerSpecs(20, 2));
+      var peerSpecs = generatePeerSpecs(20, 2);
+      var network = new MockNetwork(peerSpecs);
       var value = [1, false, null, {x: new Buffer('cafe', 'hex')}]
       var node1 = new Node({
-        transport: network.transports[0]
+        transport: network.transports[0],
+        bootstraps: [network.transports[1].spec]
       });
       var node2 = new Node({
-        transport: network.transports[1]
+        transport: network.transports[1],
+        bootstraps: [network.transports[0].spec]
       });
-      node1.putHashData(value, function(err) {
-        assert(!err, err);
-        node2.getHashData(Value.hashData(value), function(err, gotValue) {
+      Async.parallel([_.bind(node1.startServer, node1), _.bind(node2.startServer, node2)], function() {
+        node1.putHashData(value, function(err) {
           assert(!err, err);
-          assert(Value.valuesEqual(value, gotValue));
-          done();
+          node2.getHashData(Value.hashData(value), function(err, gotValue) {
+            assert(!err, err);
+            assert(Value.valuesEqual(value, gotValue));
+            done();
+          });
         });
       });
     });

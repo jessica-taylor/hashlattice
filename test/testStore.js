@@ -142,3 +142,5 @@ describe('CheckingHashStore', function() {
   });
 });
 
+describe('MergingVarStore', function() {
+});

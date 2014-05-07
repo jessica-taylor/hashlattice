@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>HashLattice</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="./css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="./starter-template.css" rel="stylesheet">
+
+    <!-- Just for debugging purposes. Don't actually copy this line! -->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="./index.html">HashLattice</a>
+        </div>
+        <div class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="./index.html">Home</a></li>
+            <li><a href="./docs.html">Documentation</a></li>
+            <li><a href="./contact.html">Contact</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+    <div class="container">
+
+      <div class="starter-template">
+        <h1>Welcome to HashLattice</h1>
+        <p class="lead">Welcome to the project page for HashLattice!</p>
+        <p>HashLattice is a distributed network which, as the title suggests, is
+        based on hash codes and lattices. Specifically, we allow users to
+        specify pages by their hash code for retrieval from peers in the network. The
+        "lattice" in HashLattice refers to how we allow people putting pages
+        into the network to dynamically update their content via a special
+        "merge" function, specified by the page creator, which functions as a
+        lattice in that the merge function takes two values and
+        returns either the better value of the two or some combination of the
+        values, like a least upper bound operator in a lattice.</p>
+        <p class="lead">Potential Applications:</p>
+        <p>
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              <h3 class="panel-title">Distributed Social Network</h3>
+            </div>
+            <div class="panel-body">One of the more interesting applications
+              that will be developed on HashLattice is a distributed social
+              network. This is a good application of HashLattice's distributed
+              nature for several reasons. A social network where each person
+              has a copy of the network should scale more easily since the more
+              popular the social network, the more people that will be serving
+              it. Additionally, the network will be more resistant to DDOS
+              attacks since a malicious attacker would have to take down many
+              nodes to make the social network completely unavailable. This
+              application should be a good test of how well the strategy used
+              to dynamically update page content described above actually
+              works.
+            </div>
+          </div>
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              <h3 class="panel-title">Bitcoin</h3>
+            </div>
+            <div class="panel-body">
+              We could implement a version of Bitcoin by using the merge
+              function described above. We'd represent the block chain as a
+              linked list and merge the different values by checking that all
+              nodes up to and including the current node are valid transactions
+              and choosing the longest one. This type of application would show
+              that HashLattice is useful for more than simple web applications.
+            </div>
+          </div>
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              <h3 class="panel-title">Code Sharing</h3>
+            </div>
+            <div class="panel-body">
+              One interesting application of HashLattice would be to implement
+              APIs for the language in a particular programming language. This
+              would allow us to define functions that update automatically to a
+              better version. For example, instead of calling a sort function
+              in a given programming language, a user could call
+              apply(hl.getVar([hash code here]), stuffToSort). The function could
+              automatically update, so it would automatically get the best
+              version if someone discovers a faster sorting algorithm.
+              One potential issue regarding this application is that it
+              requires complete trust in the party updating the code. We can
+              verify that the new program is written by the same author using
+              cryptographic signatures, but that author would still have to be
+              trusted not to replace the function with malicious code.
+            </div>
+          </div>
+        </p>
+      </div>
+
+    </div><!-- /.container -->
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="./js/bootstrap.min.js"></script>
+  </body>
+</html>
