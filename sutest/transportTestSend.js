@@ -19,7 +19,7 @@ if (targetVirtualPort === NaN) {
   process.exit();
 }
 
-udpTransport.serverStart(
+udpTransport.startServer(
   function(reqObj, cb) {
     console.log('Hark, a request object!');
     console.log(reqObj);
