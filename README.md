@@ -96,21 +96,15 @@ A *computation* is a YAML file that produces a value and can access a few functi
 
     data: 
       pages:
-        index.html: |
-          (include index.html here via having the code or a !includeBinary)
-        image.png: |
-          !includeBinary ./image.png
+        index.html: !includeBinary ./index.html
+        image.png:  !includeBinary ./image.png
     code: |
       function(hl) {
         // retrieve the path from hl and return a Javascript object containing
         // 3 elements here: headers, api (an API specified for individual
         // sites), and content
       }
-    // TODO we still need to standardize this.... a few issues come to mind:
-    // 1. where do we put the headers if we format the data like "pages" above?
-    // 2. can we still just specify one file in the data section (no "pages"
-    // section)?
-    // 3. we should mock up an example of what variables look like in yaml
+    // TODO we should mock up an example of what variables look like in yaml
     // files. I understand we have a varhash section that refers to the hash of
     // the variable, but I'm not sure what the yaml file the !hashYaml
     // statement is referring to looks like
