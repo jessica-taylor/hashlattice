@@ -22,7 +22,8 @@
     "carrier": "0.1.x",
     "rwlock": "4.0.x",
     "walk": "2.3.x",
-    "mime": "x.x.x"
+    "mime": "x.x.x",
+    "vs-stun": "x.x.x"
   },
   "devDependencies": {
     "mocha": "x.x.x",
