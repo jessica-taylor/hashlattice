@@ -66,12 +66,15 @@ describe('Node', function() {
         bootstraps: [network.transports[0].spec]
       });
       Async.parallel([_.bind(node1.startServer, node1), _.bind(node2.startServer, node2)], function() {
-        node1.putHashData(value, function(err) {
+        node1.hashDataStore.putHashData(value, function(err) {
           assert(!err, err);
-          node2.getHashData(Value.hashData(value), function(err, gotValue) {
+          node1.putHashData(value, function(err) {
             assert(!err, err);
-            assert(Value.valuesEqual(value, gotValue));
-            done();
+            node2.getHashData(Value.hashData(value), function(err, gotValue) {
+              assert(!err, err);
+              assert(Value.valuesEqual(value, gotValue));
+              done();
+            });
           });
         });
       });
