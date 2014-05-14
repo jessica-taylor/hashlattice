@@ -135,17 +135,17 @@ describe('Server', function() {
   describe('putVar', function() {
     it('should insert variables so they can be gotten', function(done) {
       var s = new Server();
-      var varcomp = {
+      var varComp = {
         data: {},
         code: '{defaultValue: function() { return [0,0]; }, ' +
               ' merge: function(x, y) { ' +
               '   return [Math.max(x[0], y[0]), Math.max(x[1], y[1])]; }}'
       };
-      s.putVar(varcomp, [6, 0], function(err) {
+      s.putVar(varComp, [6, 0], function(err) {
         assert(!err, err);
-        s.putVar(varcomp, [0, 5], function(err) {
+        s.putVar(varComp, [0, 5], function(err) {
           assert(!err, err);
-          s.getVar(varcomp, function(err, value) {
+          s.getVar(varComp, function(err, value) {
             assert(!err, err);
             assert(Value.valuesEqual([6, 5], value));
             done();
