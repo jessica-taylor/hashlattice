@@ -137,16 +137,17 @@ describe('Server', function() {
       var s = new Server();
       var varcomp = {
         data: {},
-        code: '{defaultValue: function() { return 0; }, ' +
-              ' merge: function(x, y) { return Math.max(x, y); }}'
+        code: '{defaultValue: function() { return [0,0]; }, ' +
+              ' merge: function(x, y) { ' +
+              '   return [Math.max(x[0], y[0]), Math.max(x[1], y[1])]; }}'
       };
-      s.putVar(varcomp, 6, function(err) {
+      s.putVar(varcomp, [6, 0], function(err) {
         assert(!err, err);
-        s.putVar(varcomp, 5, function(err) {
+        s.putVar(varcomp, [0, 5], function(err) {
           assert(!err, err);
           s.getVar(varcomp, function(err, value) {
             assert(!err, err);
-            assert.equal(6, value);
+            assert(Value.valuesEqual([6, 5], value));
             done();
           });
         });
