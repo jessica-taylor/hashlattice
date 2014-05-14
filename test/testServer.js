@@ -132,4 +132,25 @@ describe('Server', function() {
       });
     });
   });
+  describe('putVar', function() {
+    it('should insert variables so they can be gotten', function(done) {
+      var s = new Server();
+      var varcomp = {
+        data: {},
+        code: '{defaultValue: function() { return 0; }, ' +
+              ' merge: function(x, y) { return Math.max(x, y); }}'
+      };
+      s.putVar(varcomp, 6, function(err) {
+        assert(!err, err);
+        s.putVar(varcomp, 5, function(err) {
+          assert(!err, err);
+          s.getVar(varcomp, function(err, value) {
+            assert(!err, err);
+            assert.equal(6, value);
+            done();
+          });
+        });
+      });
+    });
+  });
 });
