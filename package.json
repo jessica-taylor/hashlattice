@@ -27,6 +27,7 @@
   "devDependencies": {
     "mocha": "x.x.x",
     "istanbul": "x.x.x",
-    "longjohn": "x.x.x"
+    "longjohn": "x.x.x",
+    "optimist": "x.x.x"
   }
 }
