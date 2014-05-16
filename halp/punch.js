@@ -15,5 +15,7 @@ socket.bind(port, function() {
     socket.send(buf, 0, buf.length, port, ip);
     setTimeout(sendMessageToOther, 1000);
   }
-  sendMessageToOther();
+  if (process.argv[3] !== 'nosend') {
+    sendMessageToOther();
+  }
 });
