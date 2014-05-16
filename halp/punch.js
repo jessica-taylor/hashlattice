@@ -1,6 +1,8 @@
 var Readline = require('readline');
 var Dgram = require('dgram');
 
+var Longjohn = require('longjohn');
+
 var argv = require('optimist').argv;
 console.log(argv);
 
@@ -14,16 +16,16 @@ var socket = Dgram.createSocket('udp4', function(msg) {
 });
 
 function sendMessageTo(ipaddr) {
-  console.log('sending');
+  console.log('sending to', ipaddr);
   var buf = new Buffer('hello', 'utf8');
   socket.send(buf, 0, buf.length, port, ipaddr);
 }
 
 socket.bind(port, function() {
+  console.log('bound');
   if (sendout) {
     sendMessageTo('8.8.8.8');
   }
-  console.log('bound');
   if (!nosend) {
     function sendMessageToIP() {
       sendMessageTo(ip);
