@@ -1,2 +1,7 @@
 #!/bin/sh
-npm install git+http://github.com/jessica-taylor/node-webrtc.git#develop
+echo 'NOTE: for this to work, you must follow the instructions at https://github.com/js-platform/node-webrtc to install dependencies.  In particular, install all the packages the page asks you to in addition to libxss-dev.'
+if [ -z $JAVA_HOME ]; then
+  echo 'No JAVA_HOME.  You have to install Java and set this to a reasonable directory.'
+else
+  npm install git+http://github.com/jessica-taylor/node-webrtc.git#develop
+fi
