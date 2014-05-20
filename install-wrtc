@@ -1,0 +1,2 @@
+#!/bin/sh
+npm install git+http://github.com/jessica-taylor/node-webrtc.git#develop
