@@ -1,0 +1,36 @@
+data: {}
+code: |
+  function(hl) {
+    var exports = {};
+    exports.profileVar = function(publicKey) {
+      return {
+        data: {publicKey: publicKey},
+        code: 'cl.makeDatedPost(publicKey)'
+      };
+    };
+    exports.getProfile = function(publicKey) {
+      return hl.getVar(exports.profileVar(publicKey));
+    };
+    exports.putProfile = function(profile) {
+      var privKey = hl.getLocal('privateKey');
+      if (privKey) {
+        hl.putVar(exports.profileVar(hl.getLocal('publicKey'), cl.datedPostValue(privKey, new Date().getTime(), profile));
+        return true;
+      } else {
+        return false;
+      }
+    };
+    exports.getPrivateKey = function() {
+      return hl.getLocal('privateKey');
+    };
+    exports.getPublicKey = function() {
+      return hl.getLocal('publicKey');
+    };
+    exports.genKeyPair = function() {
+      var keys = cl.generatePrivateKey();
+      hl.putLocal('privateKey', keys.private);
+      hl.putLocal('publicKey', keys.public);
+      return keys;
+    };
+    return exports;
+  }
