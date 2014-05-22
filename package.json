@@ -23,7 +23,9 @@
     "walk": "2.3.x",
     "mime": "x.x.x",
     "vs-stun": "x.x.x",
-    "ursa": "0.8.x"
+    "ursa": "0.8.x",
+    "browserify": "x.x.x",
+    "jquery": "x.x.x"
   },
   "devDependencies": {
     "mocha": "x.x.x",
