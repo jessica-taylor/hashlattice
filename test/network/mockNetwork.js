@@ -52,4 +52,11 @@ MockTransport.prototype.request = function(peer, reqObj, callback) {
   }
 };
 
+MockTransport.prototype.getSelfPeer = function(callback) {
+  var self = this;
+  process.nextTick(function() {
+    callback(null, self.spec);
+  });
+};
+
 module.exports = MockNetwork;

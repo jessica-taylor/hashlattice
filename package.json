@@ -15,18 +15,19 @@
   "dependencies": {
     "underscore": "1.6.x",
     "async": "0.7.x",
-    "kadoh": "https://github.com/jinroh/kadoh/tarball/master",
     "mkdirp": "0.3.x",
     "js-yaml": "3.0.x",
     "wait.for": "0.6.x",
     "carrier": "0.1.x",
     "rwlock": "4.0.x",
     "walk": "2.3.x",
-    "mime": "x.x.x"
+    "mime": "x.x.x",
+    "vs-stun": "x.x.x"
   },
   "devDependencies": {
     "mocha": "x.x.x",
     "istanbul": "x.x.x",
-    "longjohn": "x.x.x"
+    "longjohn": "x.x.x",
+    "optimist": "x.x.x"
   }
 }
