@@ -52,12 +52,12 @@
     <div class="col-md-1"></div>
     <div class="col-md-10">
       <div class="panel panel-default" style="width: 80%">
-        <div class="panel-heading" id="name"><h4>Hash Man</h4></div>
-        <a href="http://www.homesteadbook.com/store/images/hashman400.jpg"><img
-          src="http://www.homesteadbook.com/store/images/hashman400.jpg"
+        <div class="panel-heading" id="name"><h4><%- viewName %></h4></div>
+        <a href="/<%- viewImage %>"><img
+          src="/<%- viewImage %>"
           height="171" width="180" class="thumbnail" /></a>
         <div class="panel-body" id="description">
-          <b>Description: </b> zomg i am a hash person
+          <b>Description: </b> <%- viewDescription %>
         </div>
       </div>
     </div>

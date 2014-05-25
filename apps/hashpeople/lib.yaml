@@ -26,6 +26,10 @@ code: |
     exports.getPublicKey = function() {
       return hl.getLocal('publicKey');
     };
+    exports.setKeys = function(privateKey, publicKey) {
+      hl.setLocal('privateKey', privateKey);
+      hl.setLocal('publicKey', publicKey);
+    };
     exports.genKeyPair = function() {
       var keys = cl.generatePrivateKey();
       hl.putLocal('privateKey', keys.private);
