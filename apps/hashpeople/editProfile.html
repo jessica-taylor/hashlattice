@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,
     initial-scale=1">
-    <title>HashPeople - Profile</title>
+    <title>HashPeople - Edit Profile</title>
 
     <!-- Bootstrap -->
     <link href="css/bootstrap.min.css"
@@ -53,12 +53,20 @@
     <div class="col-md-1"></div>
     <div class="col-md-10">
       <div class="panel panel-default" style="width: 80%">
-        <div class="panel-heading" id="name"><h4><%- viewName %></h4></div>
+        <div class="panel-heading" id="name"><h4><%- viewName %></h4> Enter a
+          new name: <input type="text" id="newName"></input></div>
         <a href="/<%- viewImage %>"><img
           src="/<%- viewImage %>"
           height="171" width="180" class="thumbnail" /></a>
+        <input type="file" id="newImage" name="file" value="Upload Image"/>
         <div class="panel-body" id="description">
           <b>Description: </b> <%- viewDescription %>
+          <br>
+          Enter a new description below.
+          <br>
+          <textarea id="newDesc" rows="4" cols="50"></textarea>
+          <button type="submit" class="btn btn-default" style="margin-left:
+            90%" onclick="handleProfileChange()">Submit</button>
         </div>
       </div>
     </div>
@@ -89,5 +97,24 @@
     -->
     <script
       src="js/bootstrap.min.js"></script>
+      <script type="text/javascript">
+      var handleProfileChange = function(evt) {
+        var file = evt.target.file;
+        if (file.type.match('image.*')) {
+          var reader = new FileReader();
+          reader.onload = (function() { 
+            var imgArrayBuffer = reader.readAsArrayBuffer(file);   
+            var imgBuffer = window.UInt8ArrayToBuffer(imgArrayBuffer);
+            var profile = {};
+            profile.name = $('#newName').val();
+            profile.description = $('#newDesc').val();
+            profile.imageBinary = imgBuffer;
+            api.putProfile(profile);
+            window.location = 'http://127.0.0.1:1337/' + window.getHashURL() +
+            '/profile?publicKey=' + api.getPublicKey();
+          });
+        }
+      }
+    </script>
   </body>
 </html>

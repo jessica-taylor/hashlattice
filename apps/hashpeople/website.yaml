@@ -6,7 +6,6 @@ code: |
   function(hl) {
     var lib = evalComputation(libComp)(hl);
     var match = /profile?publicKey=(.*)/.match(hl.path);
-    hashData({hash: <hash of the website>, key: <data key>})
     if (match) {
       var profile = lib.getProfile(match[1]);
       if (profile) {
@@ -45,7 +44,10 @@ code: |
             var prof = {name: profile.name, description: profile.description,
                         imageHash: profile.imageHash};
             lib.putProfile(prof);
-          }
+          },
+          setKeys: lib.setKeys,
+          getPublicKey: lib.getPublicKey,
+          genKeyPair: lib.genKeyPair
         }
       };
     } else {

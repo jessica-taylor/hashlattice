@@ -31,13 +31,14 @@
     <div class="container">
 
       <form class="form-signin" role="form">
-        <h2 class="form-signin-heading">Please sign in</h2>
-        <input type="email" class="form-control" placeholder="Email address" required autofocus>
-        <input type="password" class="form-control" placeholder="Password" required>
-        <label class="checkbox">
-          <input type="checkbox" value="remember-me"> Remember me
-        </label>
-        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+        <h2 class="form-signin-heading">Please sign into HashPeople</h2>
+        <input id="pubKey" class="form-control" placeholder="Public key" required autofocus>
+        <input id="privKey" type="password" class="form-control" placeholder="Private key" required>
+        <button class="btn btn-lg btn-primary btn-block" type="submit"
+          onclick="handleSignIn()">Sign in</button>
+        <button class="btn btn-lg btn-primary btn-block" type="submit"
+          onclick="handleCreateProfile()">Create
+          new profile</button>
       </form>
 
     </div> <!-- /container -->
@@ -47,4 +48,21 @@
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
   </body>
+
+  <script src="/weblib.js"></script>
+  <script type="text/javascript">
+    var handleSignIn = function() {
+      var pubKey = $('#pubKey').val();
+      var privKey = $('#privKey').val();
+      api.setKeys(pubKey, privKey);
+      window.location = 'http://127.0.0.1:1337/' + window.getHashURL() +
+        '/profile?publicKey=' + pubkey;
+    }
+
+    var handleCreateProfile = function() {
+      var keyPair = api.genKeyPair();
+      window.location = 'http://127.0.0.1:1337/' + window.getHashURL() +
+        '/editProfile';
+    }
+  </script>
 </html>
