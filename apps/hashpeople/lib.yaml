@@ -14,7 +14,7 @@ code: |
     exports.putProfile = function(profile) {
       var privKey = hl.getLocal('privateKey');
       if (privKey) {
-        hl.putVar(exports.profileVar(hl.getLocal('publicKey'), cl.datedPostValue(privKey, new Date().getTime(), profile));
+        hl.putVar(exports.profileVar(hl.getLocal('publicKey'), cl.datedPostValue(privKey, new Date().getTime(), profile)));
         return true;
       } else {
         return false;
