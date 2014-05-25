@@ -22,7 +22,7 @@ function sendMessagesTo(ipaddr, otherPort) {
   setTimeout(function() { sendMessagesTo(ipaddr, otherPort); }, 500);
 }
 
-socket.bind(port, function() {
+socket.bind(12321, function() {
   console.log('bound');
   var server = { host: 'stun.l.google.com', port: 19302 };
   Stun.resolve(socket, server, function(err, stunresp) {
