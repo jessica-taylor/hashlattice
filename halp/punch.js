@@ -1,3 +1,4 @@
+var assert = require('assert');
 var Readline = require('readline');
 var Dgram = require('dgram');
 var Stun = require('vs-stun');
@@ -26,7 +27,7 @@ socket.bind(12321, function() {
   console.log('bound');
   var server = { host: 'stun.l.google.com', port: 19302 };
   Stun.resolve(socket, server, function(err, stunresp) {
-    console.warn('got stun response', stunresp);
+    console.log('got stun response', stunresp);
     if (!err) {
       assert(stunresp.type == 'Open Internet' || 
              stunresp.type == 'Full Cone NAT',
@@ -34,10 +35,10 @@ socket.bind(12321, function() {
       externalIP = stunresp.public.host;
       externalPort = stunresp.public.port;
       console.log('ip', externalIP, 'port', externalPort);
-      var rl = readline.createInterface({input: process.stdin,
+      var rl = Readline.createInterface({input: process.stdin,
                                          output: process.stdout});
-      rl.question('ip?', function(otherIP) {
-        rl.question('port?', function(otherPort) {
+      rl.question('ip? ', function(otherIP) {
+        rl.question('port? ', function(otherPort) {
           otherPort = Number(otherPort);
           sendMessagesTo(otherIP, otherPort);
         });
