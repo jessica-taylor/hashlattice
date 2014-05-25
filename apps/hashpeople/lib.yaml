@@ -26,6 +26,11 @@ code: |
     exports.getPublicKey = function() {
       return hl.getLocal('publicKey');
     };
+    exports.getMyProfile = function() {
+      var pubKey = exports.getPublicKey();
+      if (!pubKey) return null;
+      return exports.getProfile(pubKey);
+    };
     exports.setKeys = function(privateKey, publicKey) {
       hl.setLocal('privateKey', privateKey);
       hl.setLocal('publicKey', publicKey);

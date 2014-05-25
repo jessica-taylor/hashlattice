@@ -27,6 +27,27 @@ code: |
           content: "Profile not found!"
         };
       }
+    } else if (hl.path == '/editProfile') {
+      var myProfile = lib.getMyProfile() || {};
+      var html = _.template(
+        templates['editProfile.html'].toString('utf8'),
+        {viewName: myProfile.name || '',
+         viewImage: myProfile.imageHash ? profile.imageHash.toString('hex') : '',
+         viewDescription: myProfile.description || ''});
+      return {
+        headers: {
+          "Content-Type": "text/html"
+        },
+        content: html,
+        api: {
+          putProfile: function(profile) {
+            var imageHash = putHashDataSplit({code: 'x', data: {x: profile.imageBinary}});
+            var prof = {name: profile.name, description: profile.description,
+                        imageHash: profile.imageHash};
+            lib.putProfile(prof);
+          }
+        }
+      };
     } else {
       return {
         headers: {"Content-Type": "text/plain"},
