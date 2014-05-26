@@ -114,8 +114,11 @@
             profile.description = $('#newDesc').val();
             profile.imageBinary = imgBuffer;
             api.putProfile.async(profile, function() {
-              window.location = 'http://127.0.0.1:1337/' + window.getHashURL() +
-              '/profile?publicKey=' + api.getPublicKey();
+              api.getPublicKey.async(function(err, key) {
+                window.location =
+                  'http://127.0.0.1:1337/' + window.getHashURL() +
+                  '/profile?publicKey=' + key;
+              });
             });
           };
           reader.readAsArrayBuffer(file);
