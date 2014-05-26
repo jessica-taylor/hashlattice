@@ -2,10 +2,12 @@ data:
   libComp: !includeYaml ./lib.yaml
   templates:
     "profile.html": !includeBinary ./profile.html
+    "editProfile.html": !includeBinary ./editProfile.html
+    "signin.html": !includeBinary ./signin.html
 code: |
   function(hl) {
     var lib = evalComputation(libComp)(hl);
-    var match = /profile?publicKey=(.*)/.match(hl.path);
+    var match = hl.path.match(/profile?publicKey=(.*)/);
     if (match) {
       var profile = lib.getProfile(match[1]);
       if (profile) {
@@ -44,7 +46,15 @@ code: |
             var prof = {name: profile.name, description: profile.description,
                         imageHash: profile.imageHash};
             lib.putProfile(prof);
-          },
+          }
+        }
+      };
+    } else if(hl.path == '/signIn') {
+      var html = _.template(templates['signin.html'].toString('utf8'));
+      return {
+        headers: {'Content-Type' : 'text/html' },
+        content: html,
+        api: {
           setKeys: lib.setKeys,
           getPublicKey: lib.getPublicKey,
           genKeyPair: lib.genKeyPair
