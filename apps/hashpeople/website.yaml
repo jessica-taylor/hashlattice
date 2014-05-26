@@ -7,7 +7,7 @@ data:
 code: |
   function(hl) {
     var lib = evalComputation(libComp)(hl);
-    var match = hl.path.match(/profile?publicKey=(.*)/);
+    var match = hl.path.match(/profile\?publicKey=(.*)/);
     if (match) {
       var profile = lib.getProfile(match[1]);
       if (profile) {
