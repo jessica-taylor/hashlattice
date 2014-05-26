@@ -54,15 +54,17 @@
     var handleSignIn = function() {
       var pubKey = $('#pubKey').val();
       var privKey = $('#privKey').val();
-      api.setKeys(pubKey, privKey);
-      window.location = 'http://127.0.0.1:1337/' + window.getHashURL() +
-        '/profile?publicKey=' + pubkey;
+      api.setKeys.async([pubKey, privKey], function() { 
+        window.location = 'http://127.0.0.1:1337/' + window.getHashURL() +
+          '/profile?publicKey=' + pubkey;
+      });
     }
 
     var handleCreateProfile = function() {
-      var keyPair = api.genKeyPair();
-      window.location = 'http://127.0.0.1:1337/' + window.getHashURL() +
-        '/editProfile';
+      var keyPair = api.genKeyPair.async([], function() {
+        window.location = 'http://127.0.0.1:1337/' + window.getHashURL() +
+          '/editProfile';
+      });
     }
   </script>
 </html>

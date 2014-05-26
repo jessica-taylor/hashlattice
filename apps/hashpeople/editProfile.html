@@ -109,9 +109,10 @@
             profile.name = $('#newName').val();
             profile.description = $('#newDesc').val();
             profile.imageBinary = imgBuffer;
-            api.putProfile(profile);
-            window.location = 'http://127.0.0.1:1337/' + window.getHashURL() +
-            '/profile?publicKey=' + api.getPublicKey();
+            api.putProfile.async([profile], function() {
+              window.location = 'http://127.0.0.1:1337/' + window.getHashURL() +
+              '/profile?publicKey=' + api.getPublicKey();
+            });
           });
         }
       }
