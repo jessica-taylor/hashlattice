@@ -44,7 +44,7 @@ code: |
           putProfile: function(profile) {
             var imageHash = hl.putHashDataSplit({code: 'x', data: {x: profile.imageBinary}});
             var prof = {name: profile.name, description: profile.description,
-                        imageHash: profile.imageHash};
+                        imageHash: imageHash};
             lib.putProfile(prof);
           },
           getPublicKey: lib.getPublicKey
