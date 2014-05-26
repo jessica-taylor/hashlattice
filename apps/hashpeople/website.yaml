@@ -42,11 +42,12 @@ code: |
         content: html,
         api: {
           putProfile: function(profile) {
-            var imageHash = putHashDataSplit({code: 'x', data: {x: profile.imageBinary}});
+            var imageHash = hl.putHashDataSplit({code: 'x', data: {x: profile.imageBinary}});
             var prof = {name: profile.name, description: profile.description,
                         imageHash: profile.imageHash};
             lib.putProfile(prof);
-          }
+          },
+          getPublicKey: lib.getPublicKey
         }
       };
     } else if(hl.path == '/signIn') {

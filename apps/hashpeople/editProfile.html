@@ -103,13 +103,12 @@
       src="js/bootstrap.min.js"></script>
       <script type="text/javascript">
       var handleProfileChange = function(evt) {
-        var image = $('#newImage');
-        var file = image.file;
+        var file = document.getElementById('newImage').files[0];
         if (file.type.match('image.*')) {
           var reader = new FileReader();
-          reader.onload = (function() { 
-            var imgArrayBuffer = reader.readAsArrayBuffer(file);   
-            var imgBuffer = window.UInt8ArrayToBuffer(imgArrayBuffer);
+          reader.onload = function(evt) { 
+            var imgArr = new Uint8Array(evt.target.result);
+            var imgBuffer = window.UInt8ArrayToBuffer(imgArr);
             var profile = {};
             profile.name = $('#newName').val();
             profile.description = $('#newDesc').val();
@@ -118,7 +117,8 @@
               window.location = 'http://127.0.0.1:1337/' + window.getHashURL() +
               '/profile?publicKey=' + api.getPublicKey();
             });
-          });
+          };
+          reader.readAsArrayBuffer(file);
         }
       }
     </script>
