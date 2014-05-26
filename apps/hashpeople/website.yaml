@@ -50,7 +50,7 @@ code: |
         }
       };
     } else if(hl.path == '/signIn') {
-      var html = _.template(templates['signin.html'].toString('utf8'));
+      var html = _.template(templates['signin.html'].toString('utf8'), {});
       return {
         headers: {'Content-Type' : 'text/html' },
         content: html,
