@@ -54,9 +54,13 @@
     <div class="col-md-10">
       <div class="panel panel-default" style="width: 80%">
         <div class="panel-heading" id="name"><h4><%- viewName %></h4></div>
+        <% if (viewImage) { %>
         <a href="/<%- viewImage %>"><img
           src="/<%- viewImage %>"
           height="171" width="180" class="thumbnail" /></a>
+        <% } else { %>
+        This profile has no image.
+        <% } %>
         <div class="panel-body" id="description">
           <b>Description: </b> <%- viewDescription %>
         </div>
