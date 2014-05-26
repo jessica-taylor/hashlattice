@@ -13,9 +13,9 @@ code: |
       if (profile) {
         var html = _.template(
           templates['profile.html'].toString('utf8'),
-          {viewName: profile.name,
-           viewImage: profile.imageHash.toString('hex'),
-           viewDescription: profile.description});
+          {viewName: profile.name || '',
+           viewImage: profile.imageHash ? profile.imageHash.toString('hex') : '',
+           viewDescription: profile.description || ''});
         return {
           headers: {
             "Content-Type": "text/html"
