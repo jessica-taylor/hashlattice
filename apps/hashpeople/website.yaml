@@ -42,7 +42,9 @@ code: |
         content: html,
         api: {
           putProfile: function(profile) {
-            var imageHash = hl.putHashDataSplit({code: 'x', data: {x: profile.imageBinary}});
+            var imageHash = hl.putHashDataSplit(
+              {code: 'function(hl) { return {headers: {"Content-Type": "image/png"}, content: x}; }', 
+               data: {x: profile.imageBinary}});
             var prof = {name: profile.name, description: profile.description,
                         imageHash: imageHash};
             lib.putProfile(prof);
