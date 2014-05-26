@@ -25,7 +25,7 @@ function sendMessagesTo(ipaddr, otherPort) {
 
 socket.bind(12321, function() {
   console.log('bound');
-  var server = { host: 'stun.l.google.com', port: 19302 };
+  var server = { host: 'stun1.l.google.com', port: 19302 };
   Stun.resolve(socket, server, function(err, stunresp) {
     console.log('got stun response', stunresp);
     if (!err) {
