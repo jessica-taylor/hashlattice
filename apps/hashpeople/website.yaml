@@ -33,7 +33,7 @@ code: |
       var html = _.template(
         templates['editProfile.html'].toString('utf8'),
         {viewName: myProfile.name || '',
-         viewImage: myProfile.imageHash ? profile.imageHash.toString('hex') : '',
+         viewImage: myProfile.imageHash ? myProfile.imageHash.toString('hex') : '',
          viewDescription: myProfile.description || ''});
       return {
         headers: {
