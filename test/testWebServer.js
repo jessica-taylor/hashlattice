@@ -44,7 +44,7 @@ Yaml.loadYamlFile('./test/testdata/staticweb/page1.yaml', function(err, comp1) {
                 });
                 var hash = Value.hashData(comp3).toString('hex');
                 it('should serve string content again', function(done) {
-                  http.get('http://127.0.0.1:1337/' + hash, function(res) {
+                  http.get('http://127.0.0.1:1337/' + hash + '/yay', function(res) {
                     res.on('data', function(chunk) {
                       assert.equal("<html><body><p>Here's another page " +
                         "with an API!</p></body></html>\n",
@@ -56,27 +56,32 @@ Yaml.loadYamlFile('./test/testdata/staticweb/page1.yaml', function(err, comp1) {
                   });
                 });
                 it('should serve API result', function(done) {
-                  http.get('http://127.0.0.1:1337/' + hash + '/_api/apiObject',
-                    function(res) {
-                      // Put our other request in here so that we wait for the
-                      // API object to be served
-                      var reqOptions = {
-                        hostname: '127.0.0.1',
-                        port: 1337,
-                        path: '/' + hash + '/_api/callFunction/0',
-                        method: 'POST'
-                      }
+                  var reqOptions = {
+                    hostname: '127.0.0.1',
+                    port: 1337,
+                    path: '/' + hash + '/_api/apiObject',
+                    method: 'POST'
+                  };
+                  http.request(reqOptions, function(res) {
+                    // Put our other request in here so that we wait for the
+                    // API object to be served
+                    var reqOptions = {
+                      hostname: '127.0.0.1',
+                      port: 1337,
+                      path: '/' + hash + '/_api/callFunction/0',
+                      method: 'POST'
+                    };
 
-                      var req = http.request(reqOptions, function(res) {
-                        res.on('data', function(chunk) {
-                          assert.equal(1, Value.decodeValue(chunk));
-                          done();
-                        });
+                    var req = http.request(reqOptions, function(res) {
+                      res.on('data', function(chunk) {
+                        assert.equal(1, Value.decodeValue(chunk));
+                        done();
                       });
+                    });
 
-                      req.write(Value.encodeValue([]));
-                      req.end();
-                  });
+                    req.write(Value.encodeValue([]));
+                    req.end();
+                  }).end('/yay');
                 });
               });
             });
