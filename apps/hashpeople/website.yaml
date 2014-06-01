@@ -4,6 +4,14 @@ data:
     "profile.html": !includeBinary ./profile.html
     "editProfile.html": !includeBinary ./editProfile.html
     "signin.html": !includeBinary ./signin.html
+    "signgin.css": !includeBinary ./signin.css
+    "bootstrap-theme.css": !includeBinary ./css/bootstrap-theme.css
+    "bootstrap-theme.css.map": !includeBinary ./css/bootstrap-theme.css.map
+    "bootstrap-theme.min.css": !includeBinary ./css/bootstrap-theme.min.css
+    "bootstrap.css": !includeBinary ./css/bootstrap.css
+    "bootstrap.css.map": !includeBinary ./css/bootstrap.css.map
+    "bootstrap.min.css": !includeBinary ./css/bootstrap.min.css
+
 code: |
   function(hl) {
     var lib = evalComputation(libComp)(hl);
