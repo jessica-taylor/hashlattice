@@ -28,7 +28,10 @@
     "jquery": "x.x.x",
     "esprima": "1.2.x",
     "peerjs": "0.3.x",
-    "ws": "0.4.x"
+    "ws": "0.4.x",
+    "BlobBuilder": "0.10.x",
+    "binary-pack": "0.0.x",
+    "xmlhttprequest": "1.6.x"
   },
   "devDependencies": {
     "mocha": "x.x.x",
