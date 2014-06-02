@@ -4,7 +4,7 @@ data:
     "profile.html": !includeBinary ./profile.html
     "editProfile.html": !includeBinary ./editProfile.html
     "signin.html": !includeBinary ./signin.html
-    "signgin.css": !includeBinary ./signin.css
+    "signin.css": !includeBinary ./signin.css
   bootstrapCss: 
     "/css/bootstrap-theme.css": !includeBinary ./css/bootstrap-theme.css
     "/css/bootstrap-theme.css.map": !includeBinary ./css/bootstrap-theme.css.map
@@ -77,15 +77,15 @@ code: |
         }
       };
     } else if (hl.path in bootstrapCss) {
-      var css = templates[hl.path].toString('utf8')
+      var css = bootstrapCss[hl.path].toString('utf8');
       return {
         headers: {'Content-Type' : 'text/css'},
         content : css
       }
     } else if (hl.path in bootstrapJs) {
-      var jsCode = templates[hl.path].toString('utf8')
+      var jsCode = bootstrapJs[hl.path].toString('utf8');
       return {
-        headers: {'Content-Type' : 'application/javascript'}
+        headers: {'Content-Type' : 'application/javascript'},
         content: jsCode
       }
     } else {
