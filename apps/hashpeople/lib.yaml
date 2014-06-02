@@ -42,5 +42,11 @@ code: |
       hl.putLocal('publicKey', keys.public);
       return keys;
     };
+    exports.getFriends = function() {
+      // TODO : this
+    };
+    exports.putWallPost = function() {
+      // TODO : this
+    };
     return exports;
   }
