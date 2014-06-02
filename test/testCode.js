@@ -77,7 +77,7 @@ function testEvalComputation(evalComputation) {
   });
 }
 describe('code', function() {
-  testEvalComputation(Code.evalComputation);
+  // testEvalComputation(Code.evalComputation);
   testEvalComputation(Code.evalComputationWithoutWait);
   describe('identityComputation', function() {
     it('should create computations returning the value', function(done) {
