@@ -26,7 +26,8 @@ code: |
           templates['profile.html'].toString('utf8'),
           {viewName: profile.name || '',
            viewImage: profile.imageHash ? profile.imageHash.toString('hex') : '',
-           viewDescription: profile.description || ''});
+           viewDescription: profile.description || '',
+           viewFriends: profile.friends});
         return {
           headers: {
             "Content-Type": "text/html"
@@ -45,7 +46,8 @@ code: |
         templates['editProfile.html'].toString('utf8'),
         {viewName: myProfile.name || '',
          viewImage: myProfile.imageHash ? myProfile.imageHash.toString('hex') : '',
-         viewDescription: myProfile.description || ''});
+         viewDescription: myProfile.description || '',
+         viewFriends: profile.friends});
       return {
         headers: {
           "Content-Type": "text/html"
