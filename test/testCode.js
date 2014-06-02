@@ -11,14 +11,14 @@ var testDataValues = require('./testingUtil').testDataValues;
 function testEvalComputation(evalComputation) {
   describe(evalComputation.name, function() {
     it('should evaluate simple expressions', function(done) {
-      evalComputation({code: '1+1'}, {}, {}, function(err, result) {
+      evalComputation({code: '1+1'}, {}, function(err, result) {
         assert(!err, err);
         assert.equal(2, result);
         done();
       });
     });
     it('should allow access to data', function(done) {
-      evalComputation({data: {x: 1, y: 2}, code: 'x+y'}, {}, {}, function(err, result) {
+      evalComputation({data: {x: 1, y: 2}, code: 'x+y'}, {}, function(err, result) {
         assert(!err, err);
         assert.equal(3, result);
         done();
@@ -26,7 +26,7 @@ function testEvalComputation(evalComputation) {
     });
     it('should allow synchronous API access', function(done) {
       evalComputation({data: {x: 1}, code: 'plus(x, 5)'},
-                           {plus: function(x, y) { return x + y; }}, {},
+                           {plus: function(x, y) { return x + y; }},
                            function(err, result) {
                              assert(!err, err);
                              assert.equal(6, result);
@@ -34,19 +34,19 @@ function testEvalComputation(evalComputation) {
                            });
     });
     it('should allow asynchronous API access', function(done) {
-      var asyncApi = {
-        plus: function(x, y, callback) {
+      var api = {
+        plus: new Code.AsyncFunction('plus', function(x, y, callback) {
           process.nextTick(function() {
             callback(null, x + y)
           });
-        },
-        minus: function(x, y, callback) {
+        }),
+        minus: new Code.AsyncFunction('minus', function(x, y, callback) {
           callback(null, x - y);
-        }
+        })
       };
 
       Wait.launchFiber(function() {
-        evalComputation({data: {x: 1}, code: 'plus(minus(x, 2), 5)'}, {}, asyncApi,
+        evalComputation({data: {x: 1}, code: 'plus(minus(x, 2), 5)'}, api,
                          function(err, result) {
                            assert(!err, err);
                            assert.equal(4, result);
@@ -55,7 +55,7 @@ function testEvalComputation(evalComputation) {
       });
     });
     it('should allow returning functions', function(done) {
-      evalComputation({data: {x: 1}, code: 'function(y) { return x + y; }'}, {}, {}, function(err, result) {
+      evalComputation({data: {x: 1}, code: 'function(y) { return x + y; }'}, {}, function(err, result) {
         assert(!err, err);
         assert.equal(5, result(4));
         assert.equal(9, result(8));
@@ -63,13 +63,13 @@ function testEvalComputation(evalComputation) {
       });
     });
     it('should report syntax errors', function(done) {
-      evalComputation({code: '(]'}, {}, {}, function(err, result) {
+      evalComputation({code: '(]'}, {}, function(err, result) {
         assert(err);
         done();
       });
     });
     it('should report runtime errors', function(done) {
-      evalComputation({code: '("hello")(4)'}, {}, {}, function(err, result) {
+      evalComputation({code: '("hello")(4)'}, {}, function(err, result) {
         assert(err);
         done();
       });
@@ -82,7 +82,7 @@ describe('code', function() {
   describe('identityComputation', function() {
     it('should create computations returning the value', function(done) {
       Async.map(testDataValues, function(v, callback) {
-        Code.evalComputation(Code.identityComputation(v), {}, {}, function(err, result) {
+        Code.evalComputation(Code.identityComputation(v), {}, function(err, result) {
           assert(Value.valuesEqual(v, result));
           callback();
         });
