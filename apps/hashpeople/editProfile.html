@@ -104,7 +104,7 @@
       <script type="text/javascript">
       var handleProfileChange = function(evt) {
         var file = document.getElementById('newImage').files[0];
-        if (file.type.match('image.*')) {
+        if (file && file.type.match('image.*')) {
           var reader = new FileReader();
           reader.onload = function(evt) { 
             var imgArr = new Uint8Array(evt.target.result);
@@ -122,6 +122,17 @@
             });
           };
           reader.readAsArrayBuffer(file);
+        } else {
+          var profile = {};
+          profile.name = $('#newName').val();
+          profile.description = $('#newDesc').val();
+          api.putProfile.async(profile, function() {
+            api.getPublicKey.async(function(err, key) {
+              window.location =
+                'http://127.0.0.1:1337/' + window.getHashURL() +
+                '/profile?publicKey=' + key;
+            });
+          });
         }
       }
     </script>

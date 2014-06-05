@@ -26,8 +26,8 @@ code: |
           templates['profile.html'].toString('utf8'),
           {viewName: profile.name || '',
            viewImage: profile.imageHash ? profile.imageHash.toString('hex') : '',
-           viewDescription: profile.description || '',
-           viewFriends: profile.friends});
+           viewDescription: profile.description || ''});
+           //viewFriends: profile.friends});
         return {
           headers: {
             "Content-Type": "text/html"
@@ -46,8 +46,8 @@ code: |
         templates['editProfile.html'].toString('utf8'),
         {viewName: myProfile.name || '',
          viewImage: myProfile.imageHash ? myProfile.imageHash.toString('hex') : '',
-         viewDescription: myProfile.description || '',
-         viewFriends: profile.friends});
+         viewDescription: myProfile.description || ''});
+         //viewFriends: profile.friends});
       return {
         headers: {
           "Content-Type": "text/html"
@@ -55,9 +55,13 @@ code: |
         content: html,
         api: {
           putProfile: function(profile) {
-            var imageHash = hl.putHashDataSplit(
-              {code: 'function(hl) { return {headers: {"Content-Type": "image/png"}, content: x}; }', 
-               data: {x: profile.imageBinary}});
+            if (profile.imageBinary) {
+              var imageHash = hl.putHashDataSplit(
+                {code: 'function(hl) { return {headers: {"Content-Type": "image/png"}, content: x}; }', 
+                 data: {x: profile.imageBinary}});
+            } else {
+              var imageHash = null;
+            }
             var prof = {name: profile.name, description: profile.description,
                         imageHash: imageHash};
             lib.putProfile(prof);
