@@ -22,6 +22,9 @@ ChildProcess.exec('node_modules/.bin/browserify ./lib/webhash_weblib.js -o webha
   }
   assert(!err, err);
   var configdata = {};
+  if (argv.i) {
+    configdata.id = argv.i;
+  }
   var yamlDocs = argv.y;
   if (!Array.isArray(yamlDocs)) {
     yamlDocs = [yamlDocs];
