@@ -40,15 +40,9 @@
             class="form-group"> <input type="text" class="form-control"
             placeholder="Search"> </div> <button type="submit" class="btn
             btn-default">Submit</button> </form>
-        <form class="navbar-form navbar-left" role="search"> <div
-            class="formg-group"> <input type="text" class="form-control"
-            placeholder="Add Friend"</div> <button type="submit" class="btn
-            btn-default" onclick="alert('Hi!')">Add Friend</button></form>
-      </div>
-      <div class="collapse navbar-collapse">
+        
         <ul class="nav navbar-nav">
           <!-- TODO make search work -->
-          <!-- TODO make adding friends work -->
           <li><a href="editProfile">Edit Profile</a></li>
           <!-- TODO make signing out work -->
           <li><a href="#">Sign out</a></li>
@@ -70,6 +64,17 @@
         <div class="panel-body" id="description">
           <b>Description: </b> <%- viewDescription %>
         </div>
+      </div>
+      <div class="panel panel-default" style="width: 80%">
+        <!-- TODO how to get the name or profile of the friend to add? -->
+        <script type="application/javascript">
+          function publicKeyFromURL() {
+            var url = window.location.href;
+            var match = url.match(/profile/\?publicKey=(.*)/);
+            return match ? match[1] : null;
+          }
+        </script>
+        <button type="button" class="btn btn-default" onclick="if (publicKeyFromURL() !== null) api.addFriend(publicKeyFromURL());">Add Friend</button>
       </div>
     </div>
     <div class="col-md-1"></div>
