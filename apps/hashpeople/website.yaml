@@ -32,7 +32,12 @@ code: |
           headers: {
             "Content-Type": "text/html"
           },
-          content: html
+          content: html,
+          api: {
+            addFriend: function(publicKey) {
+              hl.putVar(publicKey, {list: publicKey});
+            }
+          }
         };
       } else {
         return {
