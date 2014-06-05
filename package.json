@@ -26,7 +26,8 @@
     "ursa": "0.8.x",
     "browserify": "x.x.x",
     "jquery": "x.x.x",
-    "esprima": "1.2.x"
+    "esprima": "1.2.x",
+    "sjcl": "1.0.x"
   },
   "devDependencies": {
     "mocha": "x.x.x",
