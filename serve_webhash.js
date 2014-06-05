@@ -15,7 +15,7 @@ console.log(argv);
 
 var staticContent = ['webhash.js', 'weblib.js'];
 
-ChildProcess.exec('node_modules/.bin/browserify -r ./lib/webhash_weblib.js -o webhash/weblib.js && node_modules/.bin/browserify -r ./lib/webhash.js -o webhash/weblib.js', function(err, stdout, stderr) {
+ChildProcess.exec('node_modules/.bin/browserify ./lib/webhash_weblib.js -o webhash/weblib.js && node_modules/.bin/browserify ./lib/webhash.js -o webhash/webhash.js', function(err, stdout, stderr) {
   if (stdout || stderr) {
     console.log('stdout:', stdout);
     console.log('stderr:', stderr);
@@ -30,15 +30,12 @@ ChildProcess.exec('node_modules/.bin/browserify -r ./lib/webhash_weblib.js -o we
     Yaml.loadYamlFile(Path.resolve(yamlDoc), cb);
   }, function(err, docContents) {
     assert(!err, err);
-    configData.hashDataList = docContents;
+    configdata.hashDataList = docContents;
 
     var httpServer = Http.createServer(function(req, res) {
       var url = req.url;
       var splitUrl = url.split('/');
-      if (splitUrl.length < 2 || splitUrl[1] === '') {
-        res.writeHead(200, {'Content-Type': 'text/plain'});
-        res.end('Welcome to HashLattice!');
-      } else if (splitUrl.length == 2 && _.contains(staticContent, splitUrl[1])) {
+      if (splitUrl.length == 2 && _.contains(staticContent, splitUrl[1])) {
         res.writeHead(200, {'Content-Type': 'text/javascript'});
         var path = Path.join(__dirname, 'webhash', splitUrl[1]);
         Fs.readFile(path, function(err, data) {
@@ -47,7 +44,7 @@ ChildProcess.exec('node_modules/.bin/browserify -r ./lib/webhash_weblib.js -o we
         });
       } else if (url == '/configdata') {
         res.writeHead(200, {'Content-Type': 'application/octet-stream'});
-        res.end(Value.encodeBinary(configdata));
+        res.end(Value.encodeValue(configdata));
       } else {
         res.writeHead(200, {'Content-Type': 'text/html'});
         var path = Path.join(__dirname, 'webhash', 'hashpage.html');
