@@ -1,2 +1,4 @@
 coverage/*
 node_modules/*
+webhash/weblib.js
+webhash/webhash.js
