@@ -9,12 +9,13 @@ code: |
       };
     };
     exports.getProfile = function(publicKey) {
-      return hl.getVar(exports.profileVar(publicKey));
+      var signed = hl.getVar(exports.profileVar(publicKey));
+      return signed && signed.value;
     };
     exports.putProfile = function(profile) {
       var privKey = hl.getLocal('privateKey');
       if (privKey) {
-        hl.putVar(exports.profileVar(hl.getLocal('publicKey'), cl.datedPostValue(privKey, new Date().getTime(), profile));
+        hl.putVar(exports.profileVar(hl.getLocal('publicKey')), cl.datedPostValue(privKey, new Date().getTime(), profile));
         return true;
       } else {
         return false;
@@ -26,11 +27,26 @@ code: |
     exports.getPublicKey = function() {
       return hl.getLocal('publicKey');
     };
+    exports.getMyProfile = function() {
+      var pubKey = exports.getPublicKey();
+      if (!pubKey) return null;
+      return exports.getProfile(pubKey);
+    };
+    exports.setKeys = function(privateKey, publicKey) {
+      hl.setLocal('privateKey', privateKey);
+      hl.setLocal('publicKey', publicKey);
+    };
     exports.genKeyPair = function() {
-      var keys = cl.generatePrivateKey();
+      var keys = cl.genKeyPair();
       hl.putLocal('privateKey', keys.private);
       hl.putLocal('publicKey', keys.public);
       return keys;
+    };
+    exports.getFriends = function() {
+      // TODO : this
+    };
+    exports.putWallPost = function() {
+      // TODO : this
     };
     return exports;
   }

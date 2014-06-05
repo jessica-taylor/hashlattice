@@ -1,0 +1,97 @@
+data:
+  libComp: !includeYaml ./lib.yaml
+  templates:
+    "profile.html": !includeBinary ./profile.html
+    "editProfile.html": !includeBinary ./editProfile.html
+    "signin.html": !includeBinary ./signin.html
+    "signin.css": !includeBinary ./signin.css
+  bootstrapCss: 
+    "/css/bootstrap-theme.css": !includeBinary ./css/bootstrap-theme.css
+    "/css/bootstrap-theme.css.map": !includeBinary ./css/bootstrap-theme.css.map
+    "/css/bootstrap-theme.min.css": !includeBinary ./css/bootstrap-theme.min.css
+    "/css/bootstrap.css": !includeBinary ./css/bootstrap.css
+    "/css/bootstrap.css.map": !includeBinary ./css/bootstrap.css.map
+    "/css/bootstrap.min.css": !includeBinary ./css/bootstrap.min.css
+  bootstrapJs:
+    "/js/bootstrap.js": !includeBinary ./js/bootstrap.js
+    "/js/bootstrap.min.js": !includeBinary ./js/bootstrap.min.js
+code: |
+  function(hl) {
+    var lib = evalComputation(libComp)(hl);
+    var match = hl.path.match(/profile\?publicKey=(.*)/);
+    if (match) {
+      var profile = lib.getProfile(match[1]);
+      if (profile) {
+        var html = _.template(
+          templates['profile.html'].toString('utf8'),
+          {viewName: profile.name || '',
+           viewImage: profile.imageHash ? profile.imageHash.toString('hex') : '',
+           viewDescription: profile.description || '',
+           viewFriends: profile.friends});
+        return {
+          headers: {
+            "Content-Type": "text/html"
+          },
+          content: html
+        };
+      } else {
+        return {
+          headers: {"Content-Type": "text/plain"},
+          content: "Profile not found!"
+        };
+      }
+    } else if (hl.path == '/editProfile') {
+      var myProfile = lib.getMyProfile() || {};
+      var html = _.template(
+        templates['editProfile.html'].toString('utf8'),
+        {viewName: myProfile.name || '',
+         viewImage: myProfile.imageHash ? myProfile.imageHash.toString('hex') : '',
+         viewDescription: myProfile.description || '',
+         viewFriends: profile.friends});
+      return {
+        headers: {
+          "Content-Type": "text/html"
+        },
+        content: html,
+        api: {
+          putProfile: function(profile) {
+            var imageHash = hl.putHashDataSplit(
+              {code: 'function(hl) { return {headers: {"Content-Type": "image/png"}, content: x}; }', 
+               data: {x: profile.imageBinary}});
+            var prof = {name: profile.name, description: profile.description,
+                        imageHash: imageHash};
+            lib.putProfile(prof);
+          },
+          getPublicKey: lib.getPublicKey
+        }
+      };
+    } else if(hl.path == '/signIn') {
+      var html = _.template(templates['signin.html'].toString('utf8'), {});
+      return {
+        headers: {'Content-Type' : 'text/html' },
+        content: html,
+        api: {
+          setKeys: lib.setKeys,
+          getPublicKey: lib.getPublicKey,
+          genKeyPair: lib.genKeyPair
+        }
+      };
+    } else if (hl.path in bootstrapCss) {
+      var css = bootstrapCss[hl.path].toString('utf8');
+      return {
+        headers: {'Content-Type' : 'text/css'},
+        content : css
+      }
+    } else if (hl.path in bootstrapJs) {
+      var jsCode = bootstrapJs[hl.path].toString('utf8');
+      return {
+        headers: {'Content-Type' : 'application/javascript'},
+        content: jsCode
+      }
+    } else {
+      return {
+        headers: {"Content-Type": "text/plain"},
+        content: "Bad URL."
+      };
+    }
+  }

@@ -1,36 +1,50 @@
+var assert = require('assert');
 var Readline = require('readline');
 var Dgram = require('dgram');
+var Stun = require('vs-stun');
 
 var Longjohn = require('longjohn');
 
 var argv = require('optimist').argv;
 console.log(argv);
 
-var ip = argv._[0];
-var port = 13337 || argv.port;
-var nosend = argv.nosend || false;
-var sendout = argv.sendout || false;
-
 var socket = Dgram.createSocket('udp4', function(msg) {
   console.log('got ' + msg.toString('utf8'));
 });
 
-function sendMessageTo(ipaddr) {
-  console.log('sending to', ipaddr);
+function sendMessageTo(ipaddr, otherPort) {
+  console.log('sending to', ipaddr, otherPort);
   var buf = new Buffer('hello', 'utf8');
-  socket.send(buf, 0, buf.length, port, ipaddr);
+  socket.send(buf, 0, buf.length, otherPort, ipaddr);
 }
 
-socket.bind(port, function() {
+function sendMessagesTo(ipaddr, otherPort) {
+  sendMessageTo(ipaddr, otherPort);
+  setTimeout(function() { sendMessagesTo(ipaddr, otherPort); }, 500);
+}
+
+socket.bind(12321, function() {
   console.log('bound');
-  if (sendout) {
-    sendMessageTo('8.8.8.8');
-  }
-  if (!nosend) {
-    function sendMessageToIP() {
-      sendMessageTo(ip);
-      setTimeout(sendMessageToIP, 1000);
+  var server = { host: 'stun1.l.google.com', port: 19302 };
+  Stun.resolve(socket, server, function(err, stunresp) {
+    console.log('got stun response', stunresp);
+    if (!err) {
+      assert(stunresp.type == 'Open Internet' || 
+             stunresp.type == 'Full Cone NAT',
+             'Bad NAT type: ' + stunresp.type);
+      externalIP = stunresp.public.host;
+      externalPort = stunresp.public.port;
+      console.log('ip', externalIP, 'port', externalPort);
+      var rl = Readline.createInterface({input: process.stdin,
+                                         output: process.stdout});
+      rl.question('ip? ', function(otherIP) {
+        rl.question('port? ', function(otherPort) {
+          otherPort = Number(otherPort);
+          sendMessagesTo(otherIP, otherPort);
+        });
+      });
     }
-    setTimeout(sendMessageToIP, 100);
-  }
+  });
 });
+
+

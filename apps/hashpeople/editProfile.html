@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,
     initial-scale=1">
-    <title>HashPeople - Profile</title>
+    <title>HashPeople - Edit Profile</title>
 
     <!-- Bootstrap -->
     <link href="css/bootstrap.min.css"
@@ -40,16 +40,10 @@
             class="form-group"> <input type="text" class="form-control"
             placeholder="Search"> </div> <button type="submit" class="btn
             btn-default">Submit</button> </form>
-        <form class="navbar-form navbar-left" role="search"> <div
-            class="formg-group"> <input type="text" class="form-control"
-            placeholder="Add Friend"</div> <button type="submit" class="btn
-            btn-default" onclick="alert('Hi!')">Add Friend</button></form>
-      </div>
-      <div class="collapse navbar-collapse">
         <ul class="nav navbar-nav">
           <!-- TODO make search work -->
-          <!-- TODO make adding friends work -->
-          <li><a href="editProfile">Edit Profile</a></li>
+
+          <li><a href="editProfile.html">Edit Profile</a></li>
           <!-- TODO make signing out work -->
           <li><a href="#">Sign out</a></li>
         </ul>
@@ -59,16 +53,24 @@
     <div class="col-md-1"></div>
     <div class="col-md-10">
       <div class="panel panel-default" style="width: 80%">
-        <div class="panel-heading" id="name"><h4><%- viewName %></h4></div>
+        <div class="panel-heading" id="name"><h4><%- viewName %></h4> Enter a
+          new name: <input type="text" id="newName"></input></div>
         <% if (viewImage) { %>
         <a href="/<%- viewImage %>"><img
           src="/<%- viewImage %>"
           height="171" width="180" class="thumbnail" /></a>
         <% } else { %>
-        This profile has no image.
+        Please upload an image below.
         <% } %>
+        <input type="file" id="newImage" name="file" value="Upload Image"/>
         <div class="panel-body" id="description">
           <b>Description: </b> <%- viewDescription %>
+          <br>
+          Enter a new description below.
+          <br>
+          <textarea id="newDesc" rows="4" cols="50"></textarea>
+          <button type="submit" class="btn btn-default" style="margin-left:
+            90%" onclick="handleProfileChange()">Submit</button>
         </div>
       </div>
     </div>
@@ -99,5 +101,29 @@
     -->
     <script
       src="js/bootstrap.min.js"></script>
+      <script type="text/javascript">
+      var handleProfileChange = function(evt) {
+        var file = document.getElementById('newImage').files[0];
+        if (file.type.match('image.*')) {
+          var reader = new FileReader();
+          reader.onload = function(evt) { 
+            var imgArr = new Uint8Array(evt.target.result);
+            var imgBuffer = window.UInt8ArrayToBuffer(imgArr);
+            var profile = {};
+            profile.name = $('#newName').val();
+            profile.description = $('#newDesc').val();
+            profile.imageBinary = imgBuffer;
+            api.putProfile.async(profile, function() {
+              api.getPublicKey.async(function(err, key) {
+                window.location =
+                  'http://127.0.0.1:1337/' + window.getHashURL() +
+                  '/profile?publicKey=' + key;
+              });
+            });
+          };
+          reader.readAsArrayBuffer(file);
+        }
+      }
+    </script>
   </body>
 </html>
