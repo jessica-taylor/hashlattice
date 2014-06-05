@@ -13,6 +13,8 @@ var Yaml = require('./lib/yaml');
 var argv = require('optimist').argv;
 console.log(argv);
 
+var port = argv.p || 1337;
+
 var staticContent = ['webhash.js', 'weblib.js'];
 
 ChildProcess.exec('node_modules/.bin/browserify ./lib/webhash_weblib.js -o webhash/weblib.js && node_modules/.bin/browserify ./lib/webhash.js -o webhash/webhash.js', function(err, stdout, stderr) {
@@ -26,6 +28,9 @@ ChildProcess.exec('node_modules/.bin/browserify ./lib/webhash_weblib.js -o webha
     configdata.id = argv.i;
   }
   var yamlDocs = argv.y;
+  if (yamlDocs == undefined) {
+    yamlDocs = [];
+  }
   if (!Array.isArray(yamlDocs)) {
     yamlDocs = [yamlDocs];
   }
@@ -57,8 +62,8 @@ ChildProcess.exec('node_modules/.bin/browserify ./lib/webhash_weblib.js -o webha
         });
       }
     });
-    httpServer.listen(1337, '127.0.0.1', function() {
-      console.log('http://127.0.0.1:1337/');
+    httpServer.listen(port, '127.0.0.1', function() {
+      console.log('http://127.0.0.1:' + port + '/');
     });
   });
 });
