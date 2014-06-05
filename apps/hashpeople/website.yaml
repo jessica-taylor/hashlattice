@@ -60,7 +60,11 @@ code: |
                 {code: 'function(hl) { return {headers: {"Content-Type": "image/png"}, content: x}; }', 
                  data: {x: profile.imageBinary}});
             } else {
-              var imageHash = null;
+              if (!profile.imageHash) {
+                var imageHash = null;
+              } else {
+                var imageHash = profile.imageHash;
+              }
             }
             var prof = {name: profile.name, description: profile.description,
                         imageHash: imageHash};

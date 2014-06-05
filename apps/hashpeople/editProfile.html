@@ -53,7 +53,7 @@
     <div class="col-md-1"></div>
     <div class="col-md-10">
       <div class="panel panel-default" style="width: 80%">
-        <div class="panel-heading" id="name"><h4><%- viewName %></h4> Enter a
+        <div class="panel-heading" id="name"><h4 id="oldName"><%- viewName %></h4> Enter a
           new name: <input type="text" id="newName"></input></div>
         <% if (viewImage) { %>
         <a href="/<%- viewImage %>"><img
@@ -64,7 +64,7 @@
         <% } %>
         <input type="file" id="newImage" name="file" value="Upload Image"/>
         <div class="panel-body" id="description">
-          <b>Description: </b> <%- viewDescription %>
+          <b>Description: </b> <span id="oldDesc"><%- viewDescription %></span>
           <br>
           Enter a new description below.
           <br>
@@ -111,7 +111,13 @@
             var imgBuffer = window.UInt8ArrayToBuffer(imgArr);
             var profile = {};
             profile.name = $('#newName').val();
+            if (profile.name == '') {
+              profile.name = $('#oldName').val();
+            }
             profile.description = $('#newDesc').val();
+            if (profile.description == '') {
+              profile.description = $('#oldDesc').val();
+            }
             profile.imageBinary = imgBuffer;
             api.putProfile.async(profile, function() {
               api.getPublicKey.async(function(err, key) {
@@ -125,7 +131,16 @@
         } else {
           var profile = {};
           profile.name = $('#newName').val();
+          if (profile.name == '') {
+            profile.name = $('#oldName').text();
+          }
           profile.description = $('#newDesc').val();
+          if (profile.description == '') {
+            profile.description = $('#oldDesc').text();
+          }
+          <% if (viewImage) { %>
+          profile.imageHash = new Buffer('<%- viewImage %>', 'hex');
+          <% } %>
           api.putProfile.async(profile, function() {
             api.getPublicKey.async(function(err, key) {
               window.location =
