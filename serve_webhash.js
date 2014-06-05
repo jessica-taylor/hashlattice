@@ -26,6 +26,9 @@ ChildProcess.exec('node_modules/.bin/browserify ./lib/webhash_weblib.js -o webha
     configdata.id = argv.i;
   }
   var yamlDocs = argv.y;
+  if (yamlDocs == undefined) {
+    yamlDocs = [];
+  }
   if (!Array.isArray(yamlDocs)) {
     yamlDocs = [yamlDocs];
   }
