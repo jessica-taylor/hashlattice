@@ -42,8 +42,16 @@ code: |
       hl.putLocal('publicKey', keys.public);
       return keys;
     };
-    exports.getFriends = function() {
-      // TODO : this
+    exports.getFriendsVar = function(publicKey) {
+      return {
+        data: {publicKey: publicKey},
+        code: 'cl.makeSet()'
+      };
+    };
+    exports.getMyFriends = function() {
+      var pubKey = exports.getPublicKey();
+      if (!pubKey) return null;
+      return exports.getFriends(pubKey);
     };
     exports.putWallPost = function() {
       // TODO : this

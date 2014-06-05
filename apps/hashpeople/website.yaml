@@ -26,16 +26,17 @@ code: |
           templates['profile.html'].toString('utf8'),
           {viewName: profile.name || '',
            viewImage: profile.imageHash ? profile.imageHash.toString('hex') : '',
-           viewDescription: profile.description || ''});
-           //viewFriends: profile.friends});
+           viewDescription: profile.description || '',
+           viewFriends: hl.getVar(lib.getFriendVar(match[1]))});
         return {
           headers: {
             "Content-Type": "text/html"
           },
           content: html,
           api: {
-            addFriend: function(publicKey) {
-              hl.putVar(publicKey, {list: publicKey});
+            addFriend: function(friendPublicKey) {
+              hl.putVar(exports.getFriendsVar(exports.getPublicKey()),
+                        [friendPublicKey]);
             }
           }
         };
@@ -51,8 +52,8 @@ code: |
         templates['editProfile.html'].toString('utf8'),
         {viewName: myProfile.name || '',
          viewImage: myProfile.imageHash ? myProfile.imageHash.toString('hex') : '',
-         viewDescription: myProfile.description || ''});
-         //viewFriends: profile.friends});
+         viewDescription: myProfile.description || '';
+         viewFriends: hl.getVar(lib.getFriendVar(lib.getPublicKey()));});
       return {
         headers: {
           "Content-Type": "text/html"
