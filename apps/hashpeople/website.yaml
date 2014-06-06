@@ -22,6 +22,8 @@ code: |
     if (match) {
       var profile = lib.getProfile(match[1]);
       if (profile) {
+        var myFriends = lib.getMyFriends();
+        var isFriend = _.contains(myFriends, match[1]);
         var friends = _.map(hl.getVar(lib.getFriendsVar(match[1])),
           function(pubKey) { 
             var profile = lib.getProfile(pubKey);
@@ -32,7 +34,8 @@ code: |
           {viewName: profile.name || '',
            viewImage: profile.imageHash ? profile.imageHash.toString('hex') : '',
            viewDescription: profile.description || '',
-           viewFriends: friends});
+           viewFriends: friends,
+           isFriend: isFriend});
         return {
           headers: {
             "Content-Type": "text/html"
@@ -40,7 +43,7 @@ code: |
           content: html,
           api: {
             addFriend: function(friendPublicKey) {
-              hl.putVar(exports.getFriendsVar(exports.getPublicKey()),
+              hl.putVar(lib.getFriendsVar(lib.getPublicKey()),
                         [friendPublicKey]);
             }
           }
