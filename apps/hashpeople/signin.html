@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
-    <link rel="shortcut icon" href="../../assets/ico/favicon.ico">
 
     <title>HashPeople - Sign In</title>
 
@@ -55,15 +54,14 @@
       var pubKey = $('#pubKey').val();
       var privKey = $('#privKey').val();
       api.setKeys.async(pubKey, privKey, function() { 
-        window.location = 'http://127.0.0.1:1337/' + window.getHashURL() +
-          '/profile?publicKey=' + pubkey;
+        window.top.openPath('/' + window.getHashURL() +
+                            '/profile?publicKey=' + pubkey);
       });
     }
 
     var handleCreateProfile = function() {
       var keyPair = api.genKeyPair.async(function() {
-        window.location = 'http://127.0.0.1:1337/' + window.getHashURL() +
-          '/editProfile';
+        window.top.openPath('/' + window.getHashURL() + '/editProfile');
       });
     }
   </script>

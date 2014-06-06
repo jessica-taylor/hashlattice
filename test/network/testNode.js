@@ -48,11 +48,6 @@ function generatePeerSpecs(numIPs, numPorts) {
   }), true);
 }
 
-function selectBootstraps(peerSpecs, nbootstraps) {
-  var indices = randUnique(function() { return randRange(peerSpecs.length); }, nbootstraps);
-  return _.map(indices, function(i) { return peerSpecs[i]; });
-}
-
 describe('Node', function() {
   describe('putHashData', function() {
     it('should put values that can be gotten from other nodes', function(done) {
@@ -60,12 +55,10 @@ describe('Node', function() {
       var network = new MockNetwork(peerSpecs);
       var value = [1, false, null, {x: new Buffer('cafe', 'hex')}]
       var node0 = new Node({
-        transport: network.transports[0],
-        bootstraps: [network.transports[1].spec]
+        transport: network.transports[0]
       });
       var node1 = new Node({
-        transport: network.transports[1],
-        bootstraps: [network.transports[0].spec]
+        transport: network.transports[1]
       });
       var node0hash = Store.layerHashStores(node0.hashDataStore, node0);
       var node1hash = Store.layerHashStores(node1.hashDataStore, node1);
@@ -94,18 +87,15 @@ describe('Node', function() {
       var varEvaluator = new Server.Server().getVarEvaluator();
       var node0 = new Node({
         transport: network.transports[0],
-        varEvaluator: varEvaluator,
-        bootstraps: [network.transports[1].spec]
+        varEvaluator: varEvaluator
       });
       var node1 = new Node({
         transport: network.transports[1],
-        varEvaluator: varEvaluator,
-        bootstraps: [network.transports[0].spec]
+        varEvaluator: varEvaluator
       });
       var node2 = new Node({
         transport: network.transports[2],
-        varEvaluator: varEvaluator,
-        bootstraps: [network.transports[0].spec]
+        varEvaluator: varEvaluator
       });
       var node0v = Store.layerVarStores(node0.varStore, node0);
       var node1v = Store.layerVarStores(node1.varStore, node1);
