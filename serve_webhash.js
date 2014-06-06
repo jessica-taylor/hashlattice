@@ -39,6 +39,9 @@ ChildProcess.exec('node_modules/.bin/browserify ./lib/webhash_weblib.js -o webha
   }, function(err, docContents) {
     assert(!err, err);
     configdata.hashDataList = docContents;
+    _.each(docContents, function(i, content) {
+      console.log(yamlDocs[i], Value.hashData(content).toString('hex'));
+    });
 
     var httpServer = Http.createServer(function(req, res) {
       var url = req.url;
