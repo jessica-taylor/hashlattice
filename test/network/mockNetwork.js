@@ -24,12 +24,13 @@ function MockTransport(network, spec) {
   this.network = network;
   this.spec = spec;
   this.started = false;
-  this.handler = null;
+  this.handler = function(req, cb) { cb(null, {error: 'timeout'}); };
 }
 
 MockTransport.prototype.startServer = function(handler, callback) {
   var self = this;
   assert(!self.started);
+  assert(typeof handler == 'function');
   self.started = true;
   self.handler = handler;
   process.nextTick(callback);
@@ -56,6 +57,13 @@ MockTransport.prototype.getSelfPeer = function(callback) {
   var self = this;
   process.nextTick(function() {
     callback(null, self.spec);
+  });
+};
+
+MockTransport.prototype.getBootstraps = function(callback) {
+  var self = this;
+  process.nextTick(function() {
+    callback(null, self.network.peerSpecs);
   });
 };
 
