@@ -51,7 +51,7 @@ ChildProcess.exec('node_modules/.bin/browserify ./lib/webhash_weblib.js -o webha
         });
       } else if (url == '/configdata') {
         if (argv.i) {
-          configdata.id = '' + argv.i + '-' + Math.random();
+          configdata.id = '' + argv.i + '-' + new Date().getTime();
         }
         res.writeHead(200, {'Content-Type': 'application/octet-stream'});
         res.end(Value.encodeValue(configdata));
