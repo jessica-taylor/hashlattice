@@ -119,8 +119,10 @@
               profile.description = $('#oldDesc').val();
             }
             profile.imageBinary = imgBuffer;
-            api.putProfile.async(profile, function() {
+            api.putProfile.async(profile, function(err) {
+              if (err) console.error(err);
               api.getPublicKey.async(function(err, key) {
+                if (err) console.error(err);
                 window.top.openPath('/' + window.getHashURL() +
                   '/profile?publicKey=' + key);
               });
@@ -140,8 +142,10 @@
           <% if (viewImage) { %>
           profile.imageHash = new Buffer('<%- viewImage %>', 'hex');
           <% } %>
-          api.putProfile.async(profile, function() {
+          api.putProfile.async(profile, function(err) {
+            if (err) console.error(err);
             api.getPublicKey.async(function(err, key) {
+              if (err) console.error(err);
               window.top.openPath('/' + window.getHashURL() +
                 '/profile?publicKey=' + key);
             });
