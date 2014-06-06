@@ -53,7 +53,7 @@ code: |
         {viewName: myProfile.name || '',
          viewImage: myProfile.imageHash ? myProfile.imageHash.toString('hex') : '',
          viewDescription: myProfile.description || '',
-         viewFriends: hl.getVar(lib.getFriendVar(lib.getPublicKey()))});
+         viewFriends: hl.getVar(lib.getFriendsVar(lib.getPublicKey()))});
       return {
         headers: {
           "Content-Type": "text/html"
