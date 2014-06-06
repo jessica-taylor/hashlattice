@@ -15,7 +15,9 @@ code: |
     exports.putProfile = function(profile) {
       var privKey = hl.getLocal('privateKey');
       if (privKey) {
+        console.log('putting profile var');
         hl.putVar(exports.profileVar(hl.getLocal('publicKey')), cl.datedPostValue(privKey, new Date().getTime(), profile));
+        console.log('profile var put');
         return true;
       } else {
         return false;

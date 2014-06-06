@@ -142,9 +142,12 @@
           <% if (viewImage) { %>
           profile.imageHash = new Buffer('<%- viewImage %>', 'hex');
           <% } %>
+          console.log('putting profile');
           api.putProfile.async(profile, function(err) {
+            console.log('profile put');
             if (err) console.error(err);
             api.getPublicKey.async(function(err, key) {
+              console.log('public key got');
               if (err) console.error(err);
               window.top.openPath('/' + window.getHashURL() +
                 '/profile?publicKey=' + key);
