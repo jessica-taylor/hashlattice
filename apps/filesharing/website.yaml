@@ -1,0 +1,59 @@
+data:
+  htmlDocs:
+    "index.html": !includeBinary ./index.html
+    "download.html": !includeBinary ./download.html
+  bootstrapCss: 
+    "/css/bootstrap-theme.css": !includeBinary ./css/bootstrap-theme.css
+    "/css/bootstrap-theme.css.map": !includeBinary ./css/bootstrap-theme.css.map
+    "/css/bootstrap-theme.min.css": !includeBinary ./css/bootstrap-theme.min.css
+    "/css/bootstrap.css": !includeBinary ./css/bootstrap.css
+    "/css/bootstrap.css.map": !includeBinary ./css/bootstrap.css.map
+    "/css/bootstrap.min.css": !includeBinary ./css/bootstrap.min.css
+  bootstrapJs:
+    "/js/bootstrap.js": !includeBinary ./js/bootstrap.js
+    "/js/bootstrap.min.js": !includeBinary ./js/bootstrap.min.js
+code: |
+  function(hl) {
+    if (hl.path == '/' || hl.path == '/index.html') {
+      return {
+        headers: {
+          "Content-Type": "text/html"
+        },
+        content: htmlDocs['index.html'].toString('utf8'),
+        api: {
+          putFile: function(file) {
+            var comp = {data: {x: file}, code: 'x'};
+            return hl.putHashDataSplit(comp).toString('hex');
+          }
+        }
+      };
+    } else if(hl.path.indexOf('/download/') == 0) {
+      var hash = hl.path.substring('/download/'.length);
+      return {
+        headers: {'Content-Type' : 'text/html' },
+        content: htmlDocs['download.html'].toString('utf8'),
+        api: {
+          getData: function() {
+            return getHash(new Buffer(hash, 'hex'));
+          }
+        }
+      };
+    } else if (hl.path in bootstrapCss) {
+      var css = bootstrapCss[hl.path].toString('utf8');
+      return {
+        headers: {'Content-Type' : 'text/css'},
+        content : css
+      }
+    } else if (hl.path in bootstrapJs) {
+      var jsCode = bootstrapJs[hl.path].toString('utf8');
+      return {
+        headers: {'Content-Type' : 'application/javascript'},
+        content: jsCode
+      }
+    } else {
+      return {
+        headers: {"Content-Type": "text/plain"},
+        content: "Bad URL."
+      };
+    }
+  }

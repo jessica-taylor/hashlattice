@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+sudo node_modules/.bin/peerjs --allow_discovery --port 80 --debug --timeout 5000
