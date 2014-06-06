@@ -65,11 +65,10 @@
           <b>Description: </b> <%- viewDescription %>
         </div>
       </div>
-      <div class="panel panel-default" style="width: 80%">
         <!-- TODO how to get the name or profile of the friend to add? -->
         <script type="application/javascript">
           window.publicKeyFromURL = function() {
-            var url = window.location.href;
+            var url = window.top.location.href;
             var match = url.match(/profile\?publicKey=(.*)/);
             return match ? match[1] : null;
           };
@@ -78,17 +77,30 @@
             if (window.publicKeyFromURL() !== null) {
               api.addFriend.async(window.publicKeyFromURL(), function(err) {
                 if (err) {
-                  console.log('error adding friend', err);
                 } else {
-                  console.log('friend added!');
+                  window.top.location.reload();
                 }
               });
             }
           };
         </script>
+        <% if (!isFriend) { %>
         <button type="button" class="btn btn-default" onclick="window.addFriend();">Add Friend</button>
+        <% } else { %>
+        <button type="button" class="btn btn-default">Already Friends</button>
+        <% } %>
+      <div class="panel panel-default" style="width: 80%">
         <% for (var i = 0; i < viewFriends.length; i++) { %>
-        <% viewFriends[i].name %> is your friend!
+        <% if (i == 0) { %>
+        <%- viewName %>'s friends:
+        <ul>
+        <% } %>
+        <li onclick="window.top.openPath('/' + window.getHashURL() +
+        '/profile?publicKey=<%-viewFriends[i].publicKey %>')"><a><%-
+          viewFriends[i].name %></a></li>
+        <% if (i == viewFriends.length - 1) { %>
+        </ul>
+        <% } %>
         <% } %>
       </div>
     </div>
