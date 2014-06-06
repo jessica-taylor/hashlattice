@@ -52,7 +52,7 @@ code: |
     exports.getMyFriends = function() {
       var pubKey = exports.getPublicKey();
       if (!pubKey) return null;
-      return exports.getFriends(pubKey);
+      return hl.getVar(exports.getFriendsVar(pubKey));
     };
     exports.putWallPost = function() {
       // TODO : this

@@ -22,12 +22,17 @@ code: |
     if (match) {
       var profile = lib.getProfile(match[1]);
       if (profile) {
+        var friends = _.map(hl.getVar(lib.getFriendsVar(match[1])),
+          function(pubKey) { 
+            var profile = lib.getProfile(pubKey);
+            return { name: profile ? profile.name : 'Unknown', publicKey: pubKey };
+          });
         var html = _.template(
           templates['profile.html'].toString('utf8'),
           {viewName: profile.name || '',
            viewImage: profile.imageHash ? profile.imageHash.toString('hex') : '',
-           viewDescription: profile.description || ''});
-           //viewFriends: hl.getVar(lib.getFriendVar(match[1]))});
+           viewDescription: profile.description || '',
+           viewFriends: friends});
         return {
           headers: {
             "Content-Type": "text/html"
