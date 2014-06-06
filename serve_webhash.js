@@ -39,7 +39,6 @@ ChildProcess.exec('node_modules/.bin/browserify ./lib/webhash_weblib.js -o webha
     _.each(docContents, function(content, i) {
       console.log(yamlDocs[i], Value.hashData(content).toString('hex'));
     });
-    var count = 0;
     var httpServer = Http.createServer(function(req, res) {
       var url = req.url;
       var splitUrl = url.split('/');
@@ -52,7 +51,7 @@ ChildProcess.exec('node_modules/.bin/browserify ./lib/webhash_weblib.js -o webha
         });
       } else if (url == '/configdata') {
         if (argv.i) {
-          configdata.id = '' + argv.i + '-' + count++;
+          configdata.id = '' + argv.i + '-' + Math.random();
         }
         res.writeHead(200, {'Content-Type': 'application/octet-stream'});
         res.end(Value.encodeValue(configdata));
