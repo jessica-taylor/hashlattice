@@ -39,7 +39,7 @@ ChildProcess.exec('node_modules/.bin/browserify ./lib/webhash_weblib.js -o webha
   }, function(err, docContents) {
     assert(!err, err);
     configdata.hashDataList = docContents;
-    _.each(docContents, function(i, content) {
+    _.each(docContents, function(content, i) {
       console.log(yamlDocs[i], Value.hashData(content).toString('hex'));
     });
 
