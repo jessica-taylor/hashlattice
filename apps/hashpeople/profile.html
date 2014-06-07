@@ -65,8 +65,38 @@
           <b>Description: </b> <%- viewDescription %>
         </div>
       </div>
+      <div class="panel panel-default" style="width: 80%">
+        <textarea id="wallPost" rows="2" cols="50"></textarea>
+        <button class="btn btn-default" onclick="window.handlePost()">Post</button>
+        <br>
+        Wall Posts:
+        <table class="table table-hover">
+        <tbody>
+          <% for (var i = 0; i < wallPosts.length; i++) { %>
+          <tr><td><%- wallPosts[i].name %></td><td><%- new
+              Date(wallPosts[i].timestamp).toLocaleString('en')
+              %></td><td><%-wallPosts[i].post %></td></tr>
+          <% } %>
+        </tbody>
+        </table>
+      </div>
+
         <!-- TODO how to get the name or profile of the friend to add? -->
         <script type="application/javascript">
+          window.handlePost = function() {
+            var post = {};
+            post.post = $('#wallPost').val();
+            post.publicKey = '<%- publicKey %>';
+            post.timestamp = new Date().getTime();
+            api.addWallPost.async(post, function(err) {
+              if (err) {
+                console.log('error', err);
+              } else {
+                window.top.location.reload();
+              }
+            });
+          };
+
           window.publicKeyFromURL = function() {
             var url = window.top.location.href;
             var match = url.match(/profile\?publicKey=(.*)/);

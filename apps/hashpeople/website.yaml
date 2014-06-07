@@ -29,13 +29,24 @@ code: |
             var profile = lib.getProfile(pubKey);
             return { name: profile ? profile.name : 'Unknown', publicKey: pubKey };
           });
+
+        var wallPosts = _.map(hl.getVar(lib.wallPostVar(match[1])),
+          function(post) {
+            var posterProfile = lib.getProfile(post.publicKey); 
+            var newPost = _.clone(post);
+            newPost.name = posterProfile ? posterProfile.name : 'Unknown';
+            return newPost;
+          });
+
         var html = _.template(
           templates['profile.html'].toString('utf8'),
           {viewName: profile.name || '',
            viewImage: profile.imageHash ? profile.imageHash.toString('hex') : '',
            viewDescription: profile.description || '',
            viewFriends: friends,
-           isFriend: isFriend});
+           isFriend: isFriend,
+           wallPosts: wallPosts,
+           publicKey: lib.getPublicKey()});
         return {
           headers: {
             "Content-Type": "text/html"
@@ -45,6 +56,9 @@ code: |
             addFriend: function(friendPublicKey) {
               hl.putVar(lib.getFriendsVar(lib.getPublicKey()),
                         [friendPublicKey]);
+            },
+            addWallPost: function(post) {
+              hl.putVar(lib.wallPostVar(match[1]), [post]);
             }
           }
         };
