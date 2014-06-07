@@ -44,8 +44,8 @@
         <ul class="nav navbar-nav">
           <!-- TODO make search work -->
           <li><a href="editProfile">Edit Profile</a></li>
-          <!-- TODO make signing out work -->
-          <li><a href="#">Sign out</a></li>
+
+          <li><a href="signIn" onclick="window.handleSignOut()">Sign out</a></li>
         </ul>
       </div>
     </nav>
@@ -112,6 +112,10 @@
                 }
               });
             }
+          };
+
+          window.handleSignOut = function() {
+            api.signOut(); // TODO : does this need to be async?
           };
         </script>
         <% if (!isFriend) { %>
