@@ -75,7 +75,9 @@ code: |
         {viewName: myProfile.name || '',
          viewImage: myProfile.imageHash ? myProfile.imageHash.toString('hex') : '',
          viewDescription: myProfile.description || '',
-         viewFriends: hl.getVar(lib.getFriendsVar(lib.getPublicKey()))});
+         viewFriends: hl.getVar(lib.getFriendsVar(lib.getPublicKey())),
+         publicKey: lib.getPublicKey(),
+         privateKey: lib.getPrivateKey()});
       return {
         headers: {
           "Content-Type": "text/html"
