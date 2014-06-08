@@ -59,6 +59,9 @@ code: |
             },
             addWallPost: function(post) {
               hl.putVar(lib.wallPostVar(match[1]), [post]);
+            },
+            signOut: function() {
+              lib.setKeys(null, null);
             }
           }
         };
