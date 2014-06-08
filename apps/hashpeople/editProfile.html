@@ -32,8 +32,8 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <!-- TODO where should this go? your profile? -->
-        <a class="navbar-brand" href="#">HashPeople</a>
+        <a class="navbar-brand" onclick="window.top.openPath('/' +
+          window.getHashURL() + '/profile?publicKey=<%- publicKey %>')">HashPeople</a>
       </div>
       <div class="collapse navbar-collapse">
         <form class="navbar-form navbar-left" role="search"> <div
@@ -43,9 +43,9 @@
         <ul class="nav navbar-nav">
           <!-- TODO make search work -->
 
-          <li><a href="editProfile.html">Edit Profile</a></li>
+          <li><a href="editProfile">Edit Profile</a></li>
           <!-- TODO make signing out work -->
-          <li><a href="#">Sign out</a></li>
+          <li><a href="signIn" onclick="window.handleSignOut()">Sign out</a></li>
         </ul>
       </div>
     </nav>
@@ -114,6 +114,11 @@
     <script
       src="js/bootstrap.min.js"></script>
       <script type="text/javascript">
+
+      window.handleSignOut = function() {
+        api.signOut(); // TODO : does this need to be async?
+      };
+
       var handleProfileChange = function(evt) {
         var file = document.getElementById('newImage').files[0];
         if (file && file.type.match('image.*')) {

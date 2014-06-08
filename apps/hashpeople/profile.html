@@ -32,8 +32,8 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <!-- TODO where should this go? your profile? -->
-        <a class="navbar-brand" href="#">HashPeople</a>
+        <a class="navbar-brand" onclick="window.top.openPath('/' +
+          window.getHashURL() + '/profile?publicKey=<%- publicKey %>')">HashPeople</a>
       </div>
       <div class="collapse navbar-collapse">
         <form class="navbar-form navbar-left" role="search"> <div
