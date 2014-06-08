@@ -37,8 +37,7 @@ code: |
       hl.putLocal('publicKey', publicKey);
     };
     exports.genKeyPair = function() {
-      var keys = {public: '' + (hl.currentTime + 1), private: '' +
-        (hl.currentTime + 2)};
+      var keys = hl.genKeyPair();
       hl.putLocal('privateKey', keys.private);
       hl.putLocal('publicKey', keys.public);
       return keys;
