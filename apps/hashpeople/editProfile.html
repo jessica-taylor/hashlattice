@@ -73,7 +73,7 @@
             90%" onclick="handleProfileChange()">Submit</button>
         </div>
         <div class="panel-body" id="description">
-          <table class="table table-hover">
+          <table id="keyTable" class="table table-hover">
             <tr>
               <th>Public Key</th>
               <th>Private Key</th>
@@ -173,6 +173,9 @@
           });
         }
       }
+
+      setTimeout(function() { $('#keyTable').css('table-layout', 'fixed');
+          $('#keyTable').css('word-wrap', 'break-word'); }, 500);
     </script>
   </body>
 </html>
