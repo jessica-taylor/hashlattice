@@ -116,7 +116,8 @@
       <script type="text/javascript">
 
       window.handleSignOut = function() {
-        api.signOut(); // TODO : does this need to be async?
+        api.signOut.async(function(err) { console.warn('error signing out',
+              err)});
       };
 
       var handleProfileChange = function(evt) {
