@@ -28,7 +28,8 @@
     "jquery": "x.x.x",
     "esprima": "1.2.x",
     "peer": "0.2.x",
-    "js-nacl": "0.6.x"
+    "js-nacl": "0.6.x",
+    "flot": "0.8.x"
   },
   "devDependencies": {
     "mocha": "x.x.x",
