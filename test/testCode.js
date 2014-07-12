@@ -1,7 +1,6 @@
 var assert = require('assert');
 var Async = require('async');
 var _ = require('underscore');
-var Wait = require('wait.for');
 
 var Value = require('../lib/value');
 var Code = require('../lib/code');
@@ -35,31 +34,31 @@ function testEvalComputation(evalComputation) {
     });
     it('should allow asynchronous API access', function(done) {
       var api = {
-        plus: new Code.AsyncFunction('plus', function(x, y, callback) {
+        plus: new Code.AsyncFunction(function(x, y, callback) {
           process.nextTick(function() {
             callback(null, x + y)
           });
         }),
-        minus: new Code.AsyncFunction('minus', function(x, y, callback) {
+        minus: new Code.AsyncFunction(function(x, y, callback) {
           callback(null, x - y);
         })
       };
 
-      Wait.launchFiber(function() {
-        evalComputation({data: {x: 1}, code: 'plus(minus(x, 2), 5)'}, api,
-                         function(err, result) {
-                           assert(!err, err);
-                           assert.equal(4, result);
-                           done();
-                         });
-      });
+      evalComputation({data: {x: 1}, code: 'plus(minus(x, 2), 5)'}, api,
+                       function(err, result) {
+                         assert(!err, err);
+                         assert.equal(4, result);
+                         done();
+                       });
     });
     it('should allow returning functions', function(done) {
       evalComputation({data: {x: 1}, code: 'function(y) { return x + y; }'}, {}, function(err, result) {
         assert(!err, err);
-        assert.equal(5, result(4));
-        assert.equal(9, result(8));
-        done();
+        result.async(4, function(err, v) {
+          assert(!err, err);
+          assert.equal(5, v);
+          done();
+        });
       });
     });
     it('should report syntax errors', function(done) {
@@ -78,7 +77,6 @@ function testEvalComputation(evalComputation) {
 }
 describe('code', function() {
   testEvalComputation(Code.evalComputation);
-  testEvalComputation(Code.evalComputationWithoutWait);
   describe('identityComputation', function() {
     it('should create computations returning the value', function(done) {
       Async.map(testDataValues, function(v, callback) {
