@@ -34,17 +34,17 @@ function testEvalComputation(evalComputation) {
     });
     it('should allow asynchronous API access', function(done) {
       var api = {
-        plus: new Code.AsyncFunction(function(x, y, callback) {
+        plus: function(x, y, callback) {
           process.nextTick(function() {
             callback(null, x + y)
           });
-        }),
-        minus: new Code.AsyncFunction(function(x, y, callback) {
+        },
+        minus: function(x, y, callback) {
           callback(null, x - y);
-        })
+        }
       };
 
-      evalComputation({data: {x: 1}, code: 'plus(minus(x, 2), 5)'}, api,
+      evalComputation({data: {x: 1}, code: 'plus(minus(x, 2, _), 5, _)'}, api,
                        function(err, result) {
                          assert(!err, err);
                          assert.equal(4, result);
@@ -54,11 +54,8 @@ function testEvalComputation(evalComputation) {
     it('should allow returning functions', function(done) {
       evalComputation({data: {x: 1}, code: 'function(y) { return x + y; }'}, {}, function(err, result) {
         assert(!err, err);
-        result.async(4, function(err, v) {
-          assert(!err, err);
-          assert.equal(5, v);
-          done();
-        });
+        assert.equal(5, result(4));
+        done();
       });
     });
     it('should report syntax errors', function(done) {
