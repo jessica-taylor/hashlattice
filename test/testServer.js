@@ -39,7 +39,7 @@ describe('Server', function() {
   var hash = Value.hashData(comp);
   var value = 6;
   var depComp = {data: {c: comp, h: hash}, 
-                 code: '[getHashData(h), evalComputation(c), getHash(h)]'};
+                 code: '[getHashData(h, _), evalComputation(c, _), getHash(h, _)]'};
   var depHash = Value.hashData(depComp);
   var depValue = [comp, value, value];
   describe('getHash', function() {
@@ -133,23 +133,19 @@ describe('Server', function() {
     });
   });
   describe('putVar', function() {
-    it.only('should insert variables so they can be gotten', function(done) {
+    it('should insert variables so they can be gotten', function(done) {
       var s = new Server();
       var varComp = {
         data: {},
-        code: '{defaultValue: function() { return [0,0]; }, ' +
-              ' merge: function(x, y) { ' +
+        code: '{defaultValue: function(_) { return [0,0]; }, ' +
+              ' merge: function(x, y, _) { ' +
               '   return [Math.max(x[0], y[0]), Math.max(x[1], y[1])]; }}'
       };
-      console.log('yay');
       s.putVar(varComp, [6, 0], function(err) {
-        console.log('putvar');
         assert(!err, err);
         s.putVar(varComp, [0, 5], function(err) {
-          console.log('putvar2');
           assert(!err, err);
           s.getVar(varComp, function(err, value) {
-            console.log('getvar');
             assert(!err, err);
             assert(Value.valuesEqual([6, 5], value));
             done();
