@@ -80,8 +80,8 @@ describe('Node', function() {
       var network = new MockNetwork(peerSpecs);
       var varComp = {
         data: {},
-        code: '{defaultValue: function() { return [0,0]; }, ' +
-              ' merge: function(x, y) { ' +
+        code: '{defaultValue: function(_) { return [0,0]; }, ' +
+              ' merge: function(x, y, _) { ' +
               '   return [Math.max(x[0], y[0]), Math.max(x[1], y[1])]; }}'
       };
       var varEvaluator = new Server.Server().getVarEvaluator();
