@@ -88,7 +88,7 @@
             post.post = $('#wallPost').val();
             post.publicKey = '<%- publicKey %>';
             post.timestamp = new Date().getTime();
-            api.addWallPost.async(post, function(err) {
+            api.addWallPost(post, function(err) {
               if (err) {
                 console.log('error', err);
               } else {
@@ -105,7 +105,7 @@
 
           window.addFriend = function() {
             if (window.publicKeyFromURL() !== null) {
-              api.addFriend.async(window.publicKeyFromURL(), function(err) {
+              api.addFriend(window.publicKeyFromURL(), function(err) {
                 if (err) {
                 } else {
                   window.top.location.reload();
@@ -115,7 +115,7 @@
           };
 
           window.handleSignOut = function() {
-            api.signOut.async(function(err) { console.warn('error signing out',
+            api.signOut(function(err) { console.warn('error signing out',
                   err); });
           };
         </script>

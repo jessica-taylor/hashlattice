@@ -116,7 +116,7 @@
       <script type="text/javascript">
 
       window.handleSignOut = function() {
-        api.signOut.async(function(err) { console.warn('error signing out',
+        api.signOut(function(err) { console.warn('error signing out',
               err)});
       };
 
@@ -137,9 +137,9 @@
               profile.description = $('#oldDesc').val();
             }
             profile.imageBinary = imgBuffer;
-            api.putProfile.async(profile, function(err) {
+            api.putProfile(profile, function(err) {
               if (err) console.error(err);
-              api.getPublicKey.async(function(err, key) {
+              api.getPublicKey(function(err, key) {
                 if (err) console.error(err);
                 window.top.openPath('/' + window.getHashURL() +
                   '/profile?publicKey=' + key);
@@ -161,10 +161,10 @@
           profile.imageHash = new Buffer('<%- viewImage %>', 'hex');
           <% } %>
           console.log('putting profile');
-          api.putProfile.async(profile, function(err) {
+          api.putProfile(profile, function(err) {
             console.log('profile put');
             if (err) console.error(err);
-            api.getPublicKey.async(function(err, key) {
+            api.getPublicKey(function(err, key) {
               console.log('public key got');
               if (err) console.error(err);
               window.top.openPath('/' + window.getHashURL() +

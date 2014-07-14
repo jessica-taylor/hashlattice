@@ -55,7 +55,7 @@
     var handleSignIn = function() {
       var pubKey = $('#pubKey').val();
       var privKey = $('#privKey').val();
-      api.setKeys.async(privKey, pubKey, function(err) { 
+      api.setKeys(privKey, pubKey, function(err) { 
         if (err) {
           console.warn('error signing in', err);
         }
@@ -64,7 +64,7 @@
     }
 
     var handleCreateProfile = function() {
-      var keyPair = api.genKeyPair.async(function(err) {
+      var keyPair = api.genKeyPair(function(err) {
         if (err) {
           console.warn('error generating key pair for new profile', err);
         }

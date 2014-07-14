@@ -54,7 +54,7 @@
             var arr = new Uint8Array(evt.target.result);
             var buffer = window.UInt8ArrayToBuffer(arr);
             var f = {name: evt.target.name, content: buffer};
-            api.putFile.async(f, function(err, hash) {
+            api.putFile(f, function(err, hash) {
               if (err) console.error(err);
               window.top.openPath('./download/' + hash);
             });
