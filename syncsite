@@ -1,0 +1,4 @@
+#!/bin/sh
+# site is at http://s3.amazonaws.com/webha.sh/###
+cd webhash
+s3cmd sync -P . s3://webha.sh
