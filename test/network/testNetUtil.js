@@ -4,7 +4,7 @@ var NetUtil = require('../../lib/network/netutil.js');
 var Node = require('../../lib/network/node.js');
 var Peer = require('../../lib/network/peer.js');
 
-var _ = require('underscore');
+var U = require('underscore');
 
 describe('netutil', function() {
   describe('logDistance', function() {
@@ -53,8 +53,8 @@ describe('netutil', function() {
         for (var i = 0; i < newPeers.length; i++) {
           newPeerIps.push(newPeers[i].getSpec().ip);
         }
-        assert(_.contains(newPeerIps, '175.45.176.0'));
-        assert(_.contains(newPeerIps, '127.0.0.1'));
+        assert(U.contains(newPeerIps, '175.45.176.0'));
+        assert(U.contains(newPeerIps, '127.0.0.1'));
     });
     it('should return a list of peers of length 2, not modifying the ' +
        'peers', function() {
@@ -64,8 +64,8 @@ describe('netutil', function() {
         for (var i = 0; i < newPeers.length; i++) {
           newPeerIps.push(newPeers[i].getSpec().ip);
         }
-        assert(_.contains(newPeerIps, '175.45.176.0'));
-        assert(_.contains(newPeerIps, '127.0.0.1'));
+        assert(U.contains(newPeerIps, '175.45.176.0'));
+        assert(U.contains(newPeerIps, '127.0.0.1'));
     });
   });
   describe('sortPeersByDistance', function() {

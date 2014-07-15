@@ -1,7 +1,7 @@
 var fs = require('fs');
 var assert = require('assert');
 
-var _ = require('underscore');
+var U = require('underscore');
 
 var Value = require('../lib/value');
 var Yaml = require('../lib/yaml');
@@ -25,7 +25,7 @@ var dependentData = [1, 2, simpleData, Value.hashData(simpleData),
 describe('yaml', function() {
   describe('dataToYaml', function() {
     it('should convert data to readable YAML', function() {
-      _.each(testDataValues, function(data) {
+      U.each(testDataValues, function(data) {
         assert(Value.valuesEqual(data, Yaml.yamlToData(Yaml.dataToYaml(data))));
       });
     });

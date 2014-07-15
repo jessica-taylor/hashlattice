@@ -1,6 +1,6 @@
 var assert = require('assert');
 var Util = require('util');
-var _ = require('underscore');
+var U = require('underscore');
 
 var Value = require('../lib/value');
 
@@ -30,7 +30,7 @@ describe('value', function() {
   });
   describe('hashData', function() {
     it('should result in different hash values', function() {
-      var hashes = _.map(testDataValues, Value.hashData);
+      var hashes = U.map(testDataValues, Value.hashData);
       for (var i = 0; i < hashes.length; i++) {
         for (var j = i; j < hashes.length; j++) {
           assert.equal(i == j, hashes[i].toString() == hashes[j].toString());

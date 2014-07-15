@@ -1,6 +1,6 @@
 var assert = require('assert');
 
-var _ = require('underscore');
+var U = require('underscore');
 
 var Value = require('../../lib/value');
 
@@ -44,7 +44,7 @@ MockTransport.prototype.request = function(peer, reqObj, callback) {
   if (!peerTransport) {
     process.nextTick(function() { callback(null, {error: 'timeout'}); });
   } else {
-    reqObj = _.clone(reqObj);
+    reqObj = U.clone(reqObj);
     reqObj.sender = self.spec;
     peerTransport.handler(reqObj, function(err, resp) {
       assert(!err, err);

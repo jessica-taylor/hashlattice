@@ -1,6 +1,6 @@
 var assert = require('assert');
 var Async = require('async');
-var _ = require('underscore');
+var U = require('underscore');
 
 var Value = require('../lib/value');
 var Store = require('../lib/store');

@@ -5,7 +5,7 @@ var Peer = require('../../lib/network/peer.js');
 
 var PeerSet = require('../../lib/network/peerset.js');
 
-var _ = require('underscore');
+var U = require('underscore');
 
 describe('peerset', function() {
   var node = new Node();
@@ -25,8 +25,8 @@ describe('peerset', function() {
     for (var i = 0; i < peers.length; i++) {
       peerIps.push(peers[i].getSpec().ip);
     }
-    assert(_.contains(peerIps, '127.0.0.1'));
-    assert(_.contains(peerIps, '0.0.0.0'));
+    assert(U.contains(peerIps, '127.0.0.1'));
+    assert(U.contains(peerIps, '0.0.0.0'));
 
     psetWithOrigin.insert(peer4);
     var peers = psetWithOrigin.allPeers();
@@ -34,7 +34,7 @@ describe('peerset', function() {
     for (var i = 0; i < peers.length; i++) {
       peerIps.push(peers[i].getSpec().ip);
     }
-    assert(_.contains(peerIps, '1.1.1.1'));
+    assert(U.contains(peerIps, '1.1.1.1'));
   });
   it('should insert and retrieve peers correctly without origin', function() {
     psetWithoutOrigin.insert(peer2);
@@ -44,8 +44,8 @@ describe('peerset', function() {
     for (var i = 0; i < peers.length; i++) {
       peerIps.push(peers[i].getSpec().ip);
     }
-    assert(_.contains(peerIps, '127.0.0.1'));
-    assert(_.contains(peerIps, '0.0.0.0'));
+    assert(U.contains(peerIps, '127.0.0.1'));
+    assert(U.contains(peerIps, '0.0.0.0'));
 
     psetWithoutOrigin.insert(peer4);
     var peers = psetWithoutOrigin.allPeers();
@@ -53,7 +53,7 @@ describe('peerset', function() {
     for (var i = 0; i < peers.length; i++) {
       peerIps.push(peers[i].getSpec().ip);
     }
-    assert(_.contains(peerIps, '1.1.1.1'));
+    assert(U.contains(peerIps, '1.1.1.1'));
   });
   it('should only return 1 peer -- no duplicates', function() {
     var psetWithOrigin = new PeerSet({origin: peer1.getID()});

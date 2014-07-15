@@ -1,7 +1,7 @@
 
 var assert = require('assert');
 var Async = require('async');
-var _ = require('underscore');
+var U = require('underscore');
 
 var Value = require('../../lib/value');
 var Store = require('../../lib/store');
@@ -41,8 +41,8 @@ function randUnique(gen, n) {
 }
 
 function generatePeerSpecs(numIPs, numPorts) {
-  return _.flatten(_.map(randUnique(randIP, numIPs), function(ip) {
-    return _.map(randUnique(randPort, numPorts), function(port) {
+  return U.flatten(U.map(randUnique(randIP, numIPs), function(ip) {
+    return U.map(randUnique(randPort, numPorts), function(port) {
       return {ip: ip, port: port};
     });
   }), true);
@@ -62,7 +62,7 @@ describe('Node', function() {
       });
       var node0hash = Store.layerHashStores(node0.hashDataStore, node0);
       var node1hash = Store.layerHashStores(node1.hashDataStore, node1);
-      Async.parallel([_.bind(node0.startServer, node0), _.bind(node1.startServer, node1)], function() {
+      Async.parallel([U.bind(node0.startServer, node0), U.bind(node1.startServer, node1)], function() {
         node0hash.putHashData(value, function(err) {
           assert(!err, err);
           node1hash.getHashData(Value.hashData(value), function(err, gotValue) {
@@ -100,7 +100,7 @@ describe('Node', function() {
       var node0v = Store.layerVarStores(node0.varStore, node0);
       var node1v = Store.layerVarStores(node1.varStore, node1);
       var node2v = Store.layerVarStores(node2.varStore, node2);
-      Async.parallel([_.bind(node0.startServer, node0), _.bind(node1.startServer, node1), _.bind(node2.startServer, node2)], function() {
+      Async.parallel([U.bind(node0.startServer, node0), U.bind(node1.startServer, node1), U.bind(node2.startServer, node2)], function() {
         node1v.putVar(varComp, [6, 0], function(err) {
           assert(!err, err);
           node2v.putVar(varComp, [0, 5], function(err) {
