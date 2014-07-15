@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 for f in $(find lib test -name '*._js'); do
-  rm ${f/%_js/js}
+  mv ${f/%_js/js} /tmp
 done
