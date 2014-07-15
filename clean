@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+mkdir -p /tmp/hlcleaned
 for f in $(find lib test -name '*._js'); do
-  mv ${f/%_js/js} /tmp
+  mv ${f/%_js/js} /tmp/hlcleaned
 done
