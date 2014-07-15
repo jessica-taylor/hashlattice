@@ -1,4 +1,5 @@
+apps/static/website.yaml
 coverage/*
 node_modules/*
-webhash/weblib.js
 webhash/webhash.js
+webhash/weblib.js
