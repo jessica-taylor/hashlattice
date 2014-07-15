@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+_node -c lib
+_node -c test
