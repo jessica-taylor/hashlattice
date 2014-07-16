@@ -8,7 +8,7 @@ lib/store._js
 lib/utilities._js
 lib/webhash.js
 lib/weblib.js
-lib/yaml.js
+lib/yaml._js
 lib/value/index.js
 lib/value/encoding.js
 lib/value/types.js
