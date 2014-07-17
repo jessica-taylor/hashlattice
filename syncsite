@@ -1,4 +1,5 @@
 #!/bin/sh
 # site is at http://s3.amazonaws.com/webha.sh/###
+./gensite
 cd webhash
 s3cmd sync -P . s3://webha.sh

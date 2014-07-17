@@ -17,7 +17,7 @@ var port = argv.p || 1337;
 
 var staticContent = ['webhash.js', 'weblib.js'];
 
-ChildProcess.exec('./compile && node_modules/.bin/browserify ./lib/weblib.js -o webhash/weblib.js && node_modules/.bin/browserify ./lib/webhash.js -o webhash/webhash.js && ./clean', function(err, stdout, stderr) {
+ChildProcess.exec('./gensite', function(err, stdout, stderr) {
   if (stdout || stderr) {
     console.log('stdout:', stdout);
     console.log('stderr:', stderr);

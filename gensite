@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+./compile
+node_modules/.bin/browserify ./lib/weblib.js -o webhash/weblib.js
+node_modules/.bin/browserify ./lib/webhash.js -o webhash/webhash.js
+./clean
