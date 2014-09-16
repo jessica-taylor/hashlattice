@@ -17,7 +17,6 @@
     "async": "0.7.x",
     "mkdirp": "0.3.x",
     "js-yaml": "3.0.x",
-    "wait.for": "0.6.x",
     "carrier": "0.1.x",
     "rwlock": "4.0.x",
     "walk": "2.3.x",
