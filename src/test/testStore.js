@@ -16,7 +16,7 @@ var testValues = {
 };
 
 const assertValuesEqual = U.rgf(function*(store, keys, values) {
-  for (key of keys) {
+  for (const key of keys) {
     try {
       const value = yield store.get(new Buffer(key, 'hex'));
       assert(Value.valuesEqual(value, values[key]));

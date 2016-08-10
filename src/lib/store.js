@@ -12,11 +12,15 @@ var ReadWriteLock = require('rwlock');
 var _ = require('underscore');
 var mkdirp = require('mkdirp');
 
-var Utilities = require('./utilities');
+var U = require('./utilities');
 var Value = require('./value');
 
 
 var BROWSER_FS_BYTES = 100*1024*1024;
+
+function reportPutError(err) {
+  console.log('PUT ERROR', err);
+}
 
 /**
  * The ValueStore interface can be described as follows:
@@ -59,35 +63,45 @@ class MemoryStore {
 
 
 // Store using files in a directory.  Implements ValueStore interface.
-function FileStore(directory) {
-  var self = this;
-  self.directory = directory;
-  self.made = false;
-  mkdirp(self.directory, function(err) {
-    assert(!err, err);
-    self.made = true;
-  });
+class FileStore {
+  constructor(directory) {
+    this.directory = directory;
+    this.made = false;
+    mkdirp(this.directory, err => {
+      assert(!err, err);
+      this.made = true;
+    });
+  }
+  // Get file name for a key.
+  getFile(key) {
+    const self = this;
+    return U.rg(function*() {
+      yield Utilities.waitUntil(() => this.made);
+      yield [Path.join(self.directory, Value.encodeValue(key).toString('hex'))];
+    });
+  }
+
+  get(key) {
+    const self = this;
+    return U.rg(function*() {
+      const fname = yield self.getFile(key);
+      try {
+        const data = yield U.cbpromise(Fs.readFile, fname);
+        yield [Value.decodeValue(data)];
+      } catch(err) {
+        throw err.code == 'ENOENT' ? 'not found' : err;
+      }
+    });
+  }
+  put(key, value) {
+    const self = this;
+    return U.rg(function*() {
+      yield cbpromise(Fs.writeFile(yield self.getFile(key), Value.encodeValue(value)));
+    });
+  }
 }
 
-// Get file name for a key.
-FileStore.prototype.getFile = function(key, _) {
-  var self = this;
-  Utilities.when(function() { return self.made; }, _);
-  return Path.join(self.directory, Value.encodeValue(key).toString('hex'));
-};
-
-FileStore.prototype.get = function(key, _) {
-  try {
-    var data = Fs.readFile(this.getFile(key, _), _);
-  } catch (err) {
-    throw err.code == 'ENOENT' ? 'not found' : err;
-  }
-  return Value.decodeValue(data);
-};
-
-FileStore.prototype.put = function(key, value, _) {
-  Fs.writeFile(this.getFile(key, _), Value.encodeValue(value), _);
-};
+// NOTE: browser things don't work
 
 function BrowserLocalStore(prefix) {
   this.prefix = prefix;
@@ -178,42 +192,39 @@ BrowserFileStore.prototype.put = function(key, value, callback) {
 };
 
 
+
 // Layer 2 value stores, creating another value store.
-function LayeredValueStore(store1, store2) {
-  this.store1 = store1;
-  this.store2 = store2;
+class LayeredValueStore {
+  constructor(store1, store2) {
+    this.store1 = store1;
+    this.store2 = store2;
+  }
+
+  get(key) {
+    return this.store1.get(key).catch(
+        err1 => this.store2.get(key).then(
+          res => this.store1.put(key, res).catch(reportPutError).then(
+            () => Promise.resolve(res))));
+  }
+
+  put(key, value) {
+    return this.store1.put(key, value).then(
+        () => this.store2.put(key, value),
+        err1 => this.store2.put(key, value).catch(
+          // Prefer reporting err2, as store2 is the backup store.
+          err2 => Promise.reject(err2 || err1)));
+  }
 }
 
-LayeredValueStore.prototype.get = function(key, _) {
-  try {
-    return this.store1.get(key, _);
-  } catch (err1) {
-    var value2 = this.store2.get(key, _);
-    try {
-      this.store1.put(key, value2, _);
-    } catch (err3) { }
-    return value2;
-  }
-};
-
-LayeredValueStore.prototype.put = function(key, value, callback) {
-  var self = this;
-  self.store1.put(key, value, function(err1) {
-    self.store2.put(key, value, function(err2) {
-      // Prefer reporting err2, as store2 is the backup store.
-      callback(err2 || err1);
-    });
-  });
-};
 
 // Layer multiple value stores.
-function layerValueStores() {
-  var store = arguments[0];
-  for (var i = 1; i < arguments.length; i++) {
-    store = new LayeredValueStore(store, arguments[i]);
+function layerValueStores(store, ...stores) {
+  for (var nextStore of stores) {
+    store = new LayeredValueStore(store, nextStore);
   }
   return store;
 }
+
 
 /**
  * The HashStore interface can be described as follows:
@@ -226,59 +237,56 @@ function layerValueStores() {
  */
 
 // Hash store based on a ValueStore that checks gotten values.
-function CheckingHashStore(valueStore) {
-  this.valueStore = valueStore;
-  assert(this.valueStore);
-}
-
-CheckingHashStore.prototype.getHashData = function(hash, _) {
-  var data = this.valueStore.get(hash, _);
-  if (Value.hashData(data).toString('hex') != hash.toString('hex')) {
-    throw new Error('bad hash');
-  } else {
-    return data;
+class CheckingHashStore {
+  constructor(valueStore) {
+    this.valueStore = valueStore;
+    assert(this.valueStore);
   }
-};
-
-CheckingHashStore.prototype.putHashData = function(data, callback) {
-  this.valueStore.put(Value.hashData(data), data, callback);
-};
-
-function LayeredHashStore(store1, store2) {
-  this.store1 = store1;
-  this.store2 = store2;
-}
-
-LayeredHashStore.prototype.getHashData = function(hash, _) {
-  try {
-    return this.store1.getHashData(hash, _);
-  } catch (err1) {
-    var data2 = this.store2.getHashData(hash, _);
-    try {
-      this.store1.putHashData(data2);
-    } catch (err) { }
-    return data2;
-  }
-};
-
-LayeredHashStore.prototype.putHashData = function(data, callback) {
-  var self = this;
-  self.store1.putHashData(data, function(err1) {
-    self.store2.putHashData(data, function(err2) {
-      // Prefer reporting err2, as store2 is the backup store.
-      callback(err2 || err1);
+  getHashData(hash) {
+    const self = this;
+    return U.rg(function*() {
+      const data = yield self.valueStore.get(hash);
+      if (Value.hashData(data).toString('hex') != hash.toString('hex')) {
+        throw new Error('bad hash')
+      }
+      return data;
     });
-  });
-};
+  }
+  putHashData(data) {
+    return this.valueStore.put(Value.hashData(data), data);
+  }
+}
+
+class LayeredHashStore {
+  constructor(store1, store2) {
+    this.store1 = store1;
+    this.store2 = store2;
+  }
+
+  getHashData(hash) {
+    return this.store1.getHashData(hash).catch(
+        err1 => this.store2.getHashData(hash).then(
+          data => this.store1.putHashData(data).catch(reportPutError).then(
+            () => Promise.resolve(data))));
+  }
+
+  putHashData(data) {
+    return this.store1.putHashData(data).then(
+        () => this.store2.putHashData(data),
+        err1 => this.store2.putHashData(data).catch(
+          // Prefer reporting err2, as store2 is the backup store.
+          err2 => Promise.reject(err1 || err2)));
+  }
+}
 
 // Layer multiple hash stores.
-function layerHashStores() {
-  var store = arguments[0];
-  for (var i = 1; i < arguments.length; i++) {
-    store = new LayeredHashStore(store, arguments[i]);
+function layerHashStores(store, ...stores) {
+  for (var nextStore of stores) {
+    store = new LayeredHashStore(store, nextStore);
   }
   return store;
 }
+
 
 /**
  * The VarEvaluator interface can be described as follows:
@@ -301,6 +309,7 @@ function layerHashStores() {
  *   perhaps with an error.
  */
 
+// Var stores don't work!
 // Variable store backed by a ValueStore that merges new values in.
 function MergingVarStore(varEvaluator, valueStore) {
   this.varEvaluator = varEvaluator;

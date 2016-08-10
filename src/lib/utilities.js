@@ -1,4 +1,5 @@
-var Value = require('./value');
+var _ = require('underscore');
+var U = require('../globalUtil');
 
 function readAllFromStream(stream) {
   return new Promise(function(resolve, reject) {
@@ -12,22 +13,13 @@ function readAllFromStream(stream) {
   });
 }
 
-
-function when(condition, callback) {
-  if (condition()) {
-    callback();
-  } else {
-    setTimeout(function() { when(condition, callback); }, 30);
-  }
-}
-
 function inBrowser() {
   return Boolean((function() { return this && this.window; })());
 }
 
-
 module.exports = {
   readAllFromStream: readAllFromStream,
-  when: when,
   inBrowser: inBrowser
 };
+
+_.extend(module.exports, U);
