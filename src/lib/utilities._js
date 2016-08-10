@@ -17,7 +17,7 @@ function when(condition, _) {
 }
 
 function inBrowser() {
-  return Boolean((function() { return this.window; })());
+  return Boolean((function() { return this && this.window; })());
 }
 
 module.exports = {

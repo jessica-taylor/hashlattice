@@ -382,7 +382,7 @@ module.exports = {
   layerVarStores: layerVarStores
 };
 
-if ((function() { return this; })().window) {
+if ((function() { return this && this.window; })()) {
   module.exports.BrowserLocalStore = BrowserLocalStore;
   module.exports.BrowserFileStore = BrowserFileStore;
 }

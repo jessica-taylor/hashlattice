@@ -45,8 +45,6 @@ function mapOverFileRefs(data, fn) {
 
 // Creates a YAML schema type for a FileRef with a given function and datatype.
 function createFileRefType(name, fn, datatype) {
-  var self = this;
-  var map = self[datatype + 'Map'];
   // e.g. !includeYaml
   return new JsYaml.Type(name, {
     loadKind: 'scalar',

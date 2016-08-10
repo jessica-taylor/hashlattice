@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ./compile
 node_modules/.bin/mocha --require longjohn $@ `find test -name 'test*.js'`
 ./clean
