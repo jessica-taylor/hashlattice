@@ -3,6 +3,7 @@ var assert = require('assert');
 var Async = require('async');
 var mkdirp = require('mkdirp');
 var _ = require('underscore');
+var U = require('./testingUtil');
 
 var Value = require('../lib/value');
 var Store = require('../lib/store');
@@ -14,7 +15,7 @@ var testValues = {
   '1234': {'a': 5, 'b': [false, {}]}
 };
 
-const assertValuesEqual = rgf((store, keys, values) => {
+const assertValuesEqual = U.rgf(function*(store, keys, values) {
   for (key of keys) {
     try {
       const value = yield store.get(new Buffer(key, 'hex'));
@@ -31,14 +32,14 @@ const assertValuesEqual = rgf((store, keys, values) => {
 
 
 function testValueStore(store, initialValues) {
-  var initialKeys = U.keys(initialValues);
-  var testKeys = U.keys(testValues);
-  var allKeys = U.union(initialKeys, testKeys);
+  var initialKeys = _.keys(initialValues);
+  var testKeys = _.keys(testValues);
+  var allKeys = _.union(initialKeys, testKeys);
   it('should initially contain only initial values', function() {
     return assertValuesEqual(store, allKeys, initialValues);
   });
   it('should contain the union of values after putting', function() {
-    return rg(function*() {
+    return U.rg(function*() {
       for (const key of testKeys) {
         yield store.put(new Buffer(key, 'hex'), testValues[key]);
       }
@@ -55,7 +56,7 @@ var testInitValues = {
 };
 
 function mapToMemoryStore(values) {
-  var initValuesPairs = U.map(U.pairs(values), function(kv) {
+  var initValuesPairs = _.map(_.pairs(values), function(kv) {
     return [new Buffer(kv[0], 'hex'), kv[1]];
   });
   return new Store.MemoryStore(initValuesPairs);
@@ -92,16 +93,16 @@ describe('LayeredValueStore', function() {
   var store1 = mapToMemoryStore(store1values);
   var store2 = mapToMemoryStore(store2values);
   var layered = new Store.LayeredValueStore(store1, store2);
-  testValueStore(layered, U.extend(U.clone(store2values), store1values));
+  testValueStore(layered, _.extend(_.clone(store2values), store1values));
 });
 
 function assertHashValuesEqual(store, allValues, initialValues, callback) {
-  var initHashes = U.map(allValues, function(v) { return Value.hashData.toString('hex'); });
+  var initHashes = _.map(allValues, function(v) { return Value.hashData.toString('hex'); });
   Async.map(allValues, function(v, cb) {
     var vhash = Value.hashData(v);
     store.getHashData(vhash, function(err, value) {
       if (err == 'not found') {
-        assert(!U.contains(initHashes, vhash.toString('hex')));
+        assert(!_.contains(initHashes, vhash.toString('hex')));
       } else {
         assert(!err, err);
         assert(Value.valuesEqual(v, value));
@@ -112,7 +113,7 @@ function assertHashValuesEqual(store, allValues, initialValues, callback) {
 }
 
 function testHashStore(store, initialValues) {
-  var allValues = U.values(testValues).concat(initialValues);
+  var allValues = _.values(testValues).concat(initialValues);
   it('should initially contain only initial values', function(done) {
     assertHashValuesEqual(store, allValues, initialValues, done);
   });
@@ -131,7 +132,7 @@ describe('CheckingHashStore', function() {
   var initialValues = [1, {a: 'b'}, true];
   testHashStore(
     new Store.CheckingHashStore(new Store.MemoryStore(
-        U.map(initialValues, function(v) { return [Value.hashData(v), v]; }))),
+        _.map(initialValues, function(v) { return [Value.hashData(v), v]; }))),
     initialValues);
   it('should report invalid items in the store', function(done) {
     var badhash = new Buffer('cafe', 'hex');

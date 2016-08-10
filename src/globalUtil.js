@@ -1,4 +1,4 @@
-
+require('babel-polyfill');
 
 function rg(it) {
   if (typeof it == 'function') {

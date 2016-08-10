@@ -7,7 +7,7 @@ var Http = require('http');
 var Async = require('async');
 var _ = require('underscore');
 
-require('streamline').register();
+// require('streamline').register();
 
 var Value = require('./lib/value');
 var Yaml = require('./lib/yaml');
