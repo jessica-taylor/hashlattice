@@ -28,7 +28,7 @@ var Types = require('./types')
  */
 
 function encodeWith(coder, value) {
-  bufs = [];
+  var bufs = [];
   coder.encode(value, bufs);
   return Buffer.concat(bufs);
 }
@@ -77,18 +77,18 @@ function numberCoder(bytes, name) {
 }
 
 // see http://nodejs.org/api/buffer.html for more types
-doubleCoder = numberCoder(8, 'DoubleLE');
-int32Coder = numberCoder(4, 'Int32LE');
-uint8Coder = numberCoder(1, 'UInt8');
+var doubleCoder = numberCoder(8, 'DoubleLE');
+var int32Coder = numberCoder(4, 'Int32LE');
+var uint8Coder = numberCoder(1, 'UInt8');
 
-nullCoder = constCoder(null);
-booleanCoder = composeFunctionWithCoder(Number, Boolean, uint8Coder);
+var nullCoder = constCoder(null);
+var booleanCoder = composeFunctionWithCoder(Number, Boolean, uint8Coder);
 
 // This stores a number of bytes in the number as a byte, then all the number's
 // bytes (in little endian order).  In theory, it can store any number up to
 // 256^255-1.  In practice, this will be restricted to 2^32-1 to prevent issues
 // with numeric precision.
-bigSizeCoder = {
+var bigSizeCoder = {
   encode: function(value, bufs) {
     assert(value <= Math.pow(2, 32), 'value too big: ' + value);
     var bytes = [0];
@@ -114,14 +114,14 @@ bigSizeCoder = {
 };
 
 
-lengthCoder = bigSizeCoder;
+var lengthCoder = bigSizeCoder;
 
-functionRefCoder = composeFunctionWithCoder(
+var functionRefCoder = composeFunctionWithCoder(
     function(fnref) { return fref.identifier; },
     function(id) { return new FunctionRef(id); },
     lengthCoder);
 
-stringCoder = {
+var stringCoder = {
   encode: function(str, bufs) {
     var strbuf = new Buffer(str, 'utf-8');
     lengthCoder.encode(strbuf.length, bufs);
@@ -135,7 +135,7 @@ stringCoder = {
   }
 };
 
-bufferCoder = {
+var bufferCoder = {
   encode: function(buf, bufs) {
     lengthCoder.encode(buf.length, bufs);
     var newBuf = new Buffer(buf.length);

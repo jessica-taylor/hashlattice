@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
-node_modules/.bin/_node --map -c lib
-node_modules/.bin/_node --map -c test
+./node_modules/.bin/babel src -d build
+cp -r src/test/testdata build/test/testdata

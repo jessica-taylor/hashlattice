@@ -2,10 +2,10 @@
  * Working with locally stored files.
  */
 
-var Path = require('path');
+const Path = require('path');
 
 // HashLattice files go in ~/.hashlattice
-HASHLATTICE_DIR = Path.join(
+const HASHLATTICE_DIR = Path.join(
     process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE,
     '.hashlattice');
 

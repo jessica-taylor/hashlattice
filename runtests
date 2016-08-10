@@ -1,2 +1,2 @@
 #! /bin/sh
-./run_tests_with_opts -R spec
+./run_tests_with_opts -R spec $@

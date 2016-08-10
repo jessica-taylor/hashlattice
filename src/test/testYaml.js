@@ -8,7 +8,7 @@ var Yaml = require('../lib/yaml');
 
 var testDataValues = require('./testingUtil').testDataValues;
 
-var simpleDataYamlFile = './test/testdata/simpleData.yaml';
+var simpleDataYamlFile = './build/test/testdata/simpleData.yaml';
 var simpleData = [
   1,
   [1, 2, 3],
@@ -17,8 +17,8 @@ var simpleData = [
   new Buffer('R0lGODlhDAAMAIQAAP//9/X17unp5WZmZgAAAOfn515eXvPz7Y6OjuDg4J+fn5OTk6enp56enmleECcgggoBADs=', 'base64')
 ];
 
-var image = fs.readFileSync('./test/testdata/image.png');
-var dependentYamlFile = './test/testdata/dependent.yaml';
+var image = fs.readFileSync('./build/test/testdata/image.png');
+var dependentYamlFile = './build/test/testdata/dependent.yaml';
 var dependentData = [1, 2, simpleData, Value.hashData(simpleData),
                      image, Value.hashData(image)];
 

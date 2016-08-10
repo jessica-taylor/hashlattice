@@ -9,7 +9,7 @@ var Path = require('path');
 var Events = require('events');
 
 var ReadWriteLock = require('rwlock');
-var U = require('underscore');
+var _ = require('underscore');
 var mkdirp = require('mkdirp');
 
 var Utilities = require('./utilities');
@@ -29,28 +29,34 @@ var BROWSER_FS_BYTES = 100*1024*1024;
  */
 
 // In-memory store.  Implements ValueStore interface.
-function MemoryStore(initialValues) {
-  var self = this;
-  self.store = {};
-  if (initialValues) {
-    U.each(initialValues, function(v) {
-      self.store[Value.encodeValue(v[0]).toString('hex')] = v[1];
+class MemoryStore {
+  constructor(initialValues) {
+    this.store = {};
+    if (initialValues) {
+      for (const v of initialValues) {
+        this.store[Value.encodeValue(v[0]).toString('hex')] = v[1];
+      }
+    }
+  }
+  get(key) {
+    return new Promise((resolve, reject) => {
+      var str = Value.encodeValue(key).toString('hex');
+      if (str in this.store) {
+        resolve(this.store[str]);
+      } else {
+        reject('not found');
+      }
+    });
+  }
+
+  put(key, value) {
+    return new Promise((resolve, reject) => {
+      this.store[Value.encodeValue(key).toString('hex')] = value;
+      resolve();
     });
   }
 }
 
-MemoryStore.prototype.get = function(key, _) {
-  var str = Value.encodeValue(key).toString('hex');
-  if (str in this.store) {
-    return this.store[str];
-  } else {
-    throw 'not found';
-  }
-};
-
-MemoryStore.prototype.put = function(key, value, _) {
-  this.store[Value.encodeValue(key).toString('hex')] = value;
-};
 
 // Store using files in a directory.  Implements ValueStore interface.
 function FileStore(directory) {
@@ -382,7 +388,7 @@ module.exports = {
   layerVarStores: layerVarStores
 };
 
-if ((function() { return this; })().window) {
+if ((function() { return this && this.window; })()) {
   module.exports.BrowserLocalStore = BrowserLocalStore;
   module.exports.BrowserFileStore = BrowserFileStore;
 }

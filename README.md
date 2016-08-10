@@ -36,7 +36,7 @@ It is also possible to split a file up into many different pieces that are combi
 
 Using `eval()` like this is inconvenient.  This is why HashLattice allows computations to return arbitrary values, which can contain functions.  A _value_ is defined the same way a data value is defined (it can be a string, number, list, or dictionary), but it can also be a function that takes values as arguments and returns values.  The decompression algorithm used previously could be specified as a computation returning a decompression function, rather than a computation returning source code.
 
-Functions make it easy to interface HashLattice with programming languages.  Most scripting languages (including Javascript, Python, Ruby, and Perl) have an easy way to represent values, and other languages (such as Java and C++) can represent them with a bit more difficulty.  Therefore, although this is not implemented yet, it is possible to provide a library that can be used like this:
+Functions make it easy to interface HashLattice with programming languages.  Most scripting languages (including Javascript, Python, Ruby, and Perl) have an easy way to represent values, and other languages (such as Java and C++) can represent them with a bit more difficulty.  Therefore, while it has not been implemented yet, it is possible to provide a library that can be used like this:
 
         import hl 
         lib = hl.getFromHash('<sha256 hash code>')

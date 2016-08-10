@@ -1,7 +1,6 @@
 var U = require('underscore');
 var Async = require('async');
 
-var Network = require('./network');
 var Store = require('./store');
 var Value = require('./value');
 var Code = require('./code');

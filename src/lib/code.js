@@ -6,16 +6,14 @@ var assert = require('assert');
 var Escodegen = require('escodegen');
 var Esprima = require('esprima');
 var Estraverse = require('estraverse');
-var streamlineTransform = require('streamline/lib/callbacks/transform').transform;
 var U = require('underscore');
 
 var Value = require('./value');
 var Utilities = require('./utilities');
 
-function streamlineExpr(code) {
-  code = 'this._mainval = function(_) { return ' + code + '; };';
-  var transStreamline = streamlineTransform(code);
-  return '(function() { var __filename = "<computation>";' + transStreamline + ' return this._mainval; })()';
+
+function transformExpr(code) {
+  return code;
 }
 
 function evalComputation(comp, api, callback) {
@@ -36,7 +34,7 @@ function evalComputation(comp, api, callback) {
   var apiValues = U.map(apiKeys, function(k) { return api[k]; });
   var getApiToValue;
   try {
-    var code = '(function(' + apiKeys.join(', ') + ') { return ' + streamlineExpr(comp.code) + '; })';
+    var code = '(function(' + apiKeys.join(', ') + ') { return ' + transformExpr(comp.code) + '; })';
     apiToValue = Vm.runInNewContext(code, sandbox);
   } catch (ex) {
     callback(ex);
