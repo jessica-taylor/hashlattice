@@ -1,3 +1,5 @@
+var globalUtil = require('../globalUtil');
+
 // some data values to test things on
 var testDataValues = [
   10,
@@ -24,3 +26,7 @@ var testDataValues = [
 module.exports = {
   testDataValues: testDataValues
 };
+
+for (const k in globalUtil) {
+  module.exports[k] = globalUtil[k];
+}

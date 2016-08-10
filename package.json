@@ -13,7 +13,7 @@
     "url": "http://github.com/jessica-taylor/hashlattice.git"
   },
   "scripts": {
-    "build": "babel src -d compiled"
+    "build": "./compile"
   },
   "dependencies": {
     "underscore": "1.6.x",
@@ -33,7 +33,8 @@
     "escodegen": "1.3.x",
     "webtorrent": "0.96.x",
     "concat-stream": "1.4.x",
-    "babel-cli": "x.x.x"
+    "babel-cli": "x.x.x",
+    "babel-preset-es2015": "x.x.x"
   },
   "devDependencies": {
     "mocha": "x.x.x",

@@ -2,7 +2,7 @@ var assert = require('assert');
 
 var Async = require('async');
 var mkdirp = require('mkdirp');
-var U = require('underscore');
+var _ = require('underscore');
 
 var Value = require('../lib/value');
 var Store = require('../lib/store');
@@ -14,33 +14,35 @@ var testValues = {
   '1234': {'a': 5, 'b': [false, {}]}
 };
 
-function assertValuesEqual(store, keys, values, callback) {
-  Async.map(keys, function(key, cb) {
-    store.get(new Buffer(key, 'hex'), function(err, value) {
+const assertValuesEqual = rgf((store, keys, values) => {
+  for (key of keys) {
+    try {
+      const value = yield store.get(new Buffer(key, 'hex'));
+      assert(Value.valuesEqual(value, values[key]));
+    } catch (err) {
       if (err == 'not found') {
         assert(!(key in values), 'key ' + key + ' not found, but should');
       } else {
-        assert(!err, err);
-        assert(Value.valuesEqual(value, values[key]));
+        fail(err);
       }
-      cb();
-    });
-  }, function() { callback(); });
-}
+    }
+  }
+});
+
 
 function testValueStore(store, initialValues) {
   var initialKeys = U.keys(initialValues);
   var testKeys = U.keys(testValues);
   var allKeys = U.union(initialKeys, testKeys);
-  it('should initially contain only initial values', function(done) {
-    assertValuesEqual(store, allKeys, initialValues, done);
+  it('should initially contain only initial values', function() {
+    return assertValuesEqual(store, allKeys, initialValues);
   });
-  it('should contain the union of values after putting', function(done) {
-    Async.map(testKeys, function(key, cb) { 
-      store.put(new Buffer(key, 'hex'), testValues[key], cb);
-    }, function(err) {
-      assert(!err);
-      assertValuesEqual(store, allKeys, U.extend(U.clone(initialValues), testValues), done);
+  it('should contain the union of values after putting', function() {
+    return rg(function*() {
+      for (const key of testKeys) {
+        yield store.put(new Buffer(key, 'hex'), testValues[key]);
+      }
+      yield assertValuesEqual(store, allKeys, _.extend(_.clone(initialValues), testValues));
     });
   });
 }

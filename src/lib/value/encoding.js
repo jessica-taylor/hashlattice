@@ -28,7 +28,7 @@ var Types = require('./types')
  */
 
 function encodeWith(coder, value) {
-  bufs = [];
+  var bufs = [];
   coder.encode(value, bufs);
   return Buffer.concat(bufs);
 }
