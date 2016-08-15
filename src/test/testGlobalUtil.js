@@ -34,5 +34,14 @@ describe('RunGenerator', function() {
         assert.equal('error', x);
       });
     });
+    it('should report errors', function() {
+      return U.rg(function*() {
+        const x = yield Promise.resolve(1);
+        throw 'error';
+      }).then(
+        Promise.reject,
+        val => val == 'error' ? Promise.resolve() : Promise.reject(val)
+      );
+    });
   });
 });

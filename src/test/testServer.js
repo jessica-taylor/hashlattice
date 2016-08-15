@@ -1,38 +1,34 @@
 var assert = require('assert');
 var Async = require('async');
-var U = require('underscore');
+var _ = require('underscore');
 
 var Value = require('../lib/value');
 var Store = require('../lib/store');
 var Server = require('../lib/server').Server;
-var testDataValues = require('./testingUtil').testDataValues;
+var U = require('./testingUtil');
 
 describe('Server', function() {
   describe('getHashData', function() {
-    var value = [1, 2, {}];
-    var hash = Value.hashData(value);
-    it('should check hashDataStore', function(done) {
-      var s = new Server({
+    const value = [1, 2, {}];
+    const hash = Value.hashData(value);
+    it('should check hashDataStore', U.rgf(function*() {
+      const s = new Server({
         hashDataStore: new Store.CheckingHashStore(new Store.MemoryStore([[hash, value]]))
       });
-      s.getHashData(hash, function(err, val) {
-        assert(!err);
-        assert(Value.valuesEqual(value, val));
-        done();
-      });
-    });
-    it('should report errors correctly', function(done) {
+      const val = yield s.getHashData(hash);
+      assert(Value.valuesEqual(value, val));
+    }));
+    it('should report errors correctly', function() {
       var s = new Server({
         hashDataStore: {
-          getHashData: function(k, cb) {
-            cb('asdf');
+          getHashData: function(k) {
+            return Promise.reject('asdf');
           }
         }
       });
-      s.getHashData(hash, function(err, val) {
-        assert.equal('asdf', err);
-        done();
-      });
+      s.getHashData(hash).then(
+          v => Promise.reject(v),
+          err => assert.equal('asdf', err));
     });
   });
   var comp = {data: {x: 5}, code: 'x+1'};
@@ -42,98 +38,71 @@ describe('Server', function() {
                  code: '[getHashData(h, _), evalComputation(c, _), getHash(h, _)]'};
   var depHash = Value.hashData(depComp);
   var depValue = [comp, value, value];
+
   describe('getHash', function() {
-    it('should check hashEvalStore', function(done) {
+    it('should check hashEvalStore', U.rgf(function*() {
       var s = new Server({
         hashEvalStore: new Store.MemoryStore([[hash, value]])
       });
-      s.getHash(hash, function(err, val) {
-        assert(!err, err);
-        assert.equal(value, val);
-        done();
-      });
-    });
-    it('should evaluate computations', function(done) {
+      assert.equal(value, yield s.getHash(hash));
+    }));
+    it('should evaluate computations', U.rgf(function*() {
       var s = new Server({
         hashDataStore: new Store.CheckingHashStore(new Store.MemoryStore([[hash, comp]]))
       });
-      s.getHash(hash, function(err, val) {
-        assert(!err, err);
-        assert(value, val);
-        done();
-      });
-    });
-    it('should evaluate dependent computations', function(done) {
+      assert.equal(value, yield s.getHash(hash));
+    }));
+    it('should evaluate dependent computations', U.rgf(function*() {
       var s = new Server({
         hashDataStore: new Store.CheckingHashStore(new Store.MemoryStore([[hash, comp], [depHash, depComp]]))
       });
-      s.getHash(depHash, function(err, val) {
-        assert(!err, err);
-        assert(Value.valuesEqual(depValue, val));
-        done();
-      });
-    });
-    it('should report when things are not found', function(done) {
+      assert(Value.valuesEqual(depValue, yield s.getHash(depHash)));
+    }));
+    it('should report when things are not found', U.rgf(function*() {
       var s = new Server();
-      s.getHash(hash, function(err, val) {
+      try {
+        yield s.getHash(hash);
+        assert.fail();
+      } catch (err) {
         assert.equal('not found', err);
-        done();
-      });
-    });
+      }
+    }));
   });
   describe('evalComputation', function() {
     var comp = {data: {x: 5}, code: 'x+1'};
     var hash = Value.hashData(comp);
     var value = 6;
-    it('should check hashEvalStore', function(done) {
+    it('should check hashEvalStore', U.rgf(function*() {
       var s = new Server({
         hashEvalStore: new Store.MemoryStore([[hash, value]])
       });
-      s.evalComputation(comp, function(err, val) {
-        assert(!err, err);
-        assert.equal(value, val);
-        done();
-      });
-    });
-    it('should evaluate computations', function(done) {
+      assert.equal(value, yield s.evalComputation(comp));
+    }));
+    it('should evaluate computations', U.rgf(function*() {
       var s = new Server({
         hashDataStore: new Store.CheckingHashStore(new Store.MemoryStore([[hash, comp]]))
       });
-      s.evalComputation(comp, function(err, val) {
-        assert(!err, err);
-        assert.equal(value, val);
-        done();
-      });
-    });
-    it('should evaluate dependent computations', function(done) {
+      assert.equal(value, yield s.evalComputation(comp));
+    }));
+    it('should evaluate dependent computations', U.rgf(function*() {
       var s = new Server({
         hashDataStore: new Store.CheckingHashStore(new Store.MemoryStore([[hash, comp], [depHash, depComp]]))
       });
-      s.evalComputation(depComp, function(err, val) {
-        assert(!err, err);
-        assert(Value.valuesEqual(depValue, val));
-        done();
-      });
-    });
+      assert(Value.valuesEqual(depValue, yield s.evalComputation(depComp)));
+    }));
   });
   describe('putHashData', function() {
-    it('should insert data so it can be gotten', function(done) {
+    it('should insert data so it can be gotten', U.rgf(function*() {
       var s = new Server();
       var comp = {data: {x: 5}, code: 'x+1'};
       var hash = Value.hashData(comp);
       var value = 6;
-      s.putHashData(comp, function(err) {
-        assert(!err, err);
-        s.getHash(hash, function(err, result) {
-          assert(!err, err);
-          assert.equal(value, result);
-          done();
-        })
-      });
-    });
+      yield s.putHashData(comp);
+      assert.equal(value, yield s.getHash(hash));
+    }));
   });
   describe('putVar', function() {
-    it('should insert variables so they can be gotten', function(done) {
+    it('should insert variables so they can be gotten', U.rgf(function*() {
       var s = new Server();
       var varComp = {
         data: {},
@@ -141,17 +110,9 @@ describe('Server', function() {
               ' merge: function(x, y, _) { ' +
               '   return [Math.max(x[0], y[0]), Math.max(x[1], y[1])]; }}'
       };
-      s.putVar(varComp, [6, 0], function(err) {
-        assert(!err, err);
-        s.putVar(varComp, [0, 5], function(err) {
-          assert(!err, err);
-          s.getVar(varComp, function(err, value) {
-            assert(!err, err);
-            assert(Value.valuesEqual([6, 5], value));
-            done();
-          });
-        });
-      });
-    });
+      yield s.putVar(varComp, [6, 0]);
+      yield s.putVar(varComp, [0, 5]);
+      assert(Value.valuesEqual([6, 5], s.getVar(varComp)));
+    }));
   });
 });

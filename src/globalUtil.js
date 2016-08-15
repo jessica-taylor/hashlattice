@@ -1,4 +1,7 @@
 require('babel-polyfill');
+const longjohn = require('longjohn');
+
+longjohn.async_trace_limit = -1;
 
 function rg(it) {
   if (typeof it == 'function') {

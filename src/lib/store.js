@@ -245,7 +245,7 @@ class CheckingHashStore {
       if (Value.hashData(data).toString('hex') != hash.toString('hex')) {
         throw new Error('bad hash')
       }
-      return data;
+      yield [data];
     });
   }
   putHashData(data) {
