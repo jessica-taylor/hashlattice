@@ -76,7 +76,7 @@ class FileStore {
   getFile(key) {
     const self = this;
     return U.rg(function*() {
-      yield Utilities.waitUntil(() => this.made);
+      yield U.waitUntil(() => self.made);
       yield [Path.join(self.directory, Value.encodeValue(key).toString('hex'))];
     });
   }
@@ -96,7 +96,7 @@ class FileStore {
   put(key, value) {
     const self = this;
     return U.rg(function*() {
-      yield cbpromise(Fs.writeFile(yield self.getFile(key), Value.encodeValue(value)));
+      yield U.cbpromise(Fs.writeFile, yield self.getFile(key), Value.encodeValue(value));
     });
   }
 }
