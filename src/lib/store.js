@@ -69,31 +69,24 @@ class FileStore {
     });
   }
   // Get file name for a key.
-  getFile(key) {
+  async getFile(key) {
     const self = this;
-    return U.rg(function*() {
-      yield U.waitUntil(() => self.made);
-      yield [Path.join(self.directory, Value.encodeValue(key).toString('hex'))];
-    });
+    await U.waitUntil(() => self.made);
+    return Path.join(self.directory, Value.encodeValue(key).toString('hex'));
   }
 
-  get(key) {
+  async get(key) {
     const self = this;
-    return U.rg(function*() {
-      const fname = yield self.getFile(key);
-      try {
-        const data = yield U.cbpromise(Fs.readFile, fname);
-        yield [Value.decodeValue(data)];
-      } catch(err) {
-        throw err.code == 'ENOENT' ? 'not found' : err;
-      }
-    });
+    const fname = await self.getFile(key);
+    try {
+      const data = await U.cbpromise(Fs.readFile, fname);
+      return Value.decodeValue(data);
+    } catch(err) {
+      throw err.code == 'ENOENT' ? 'not found' : err;
+    }
   }
-  put(key, value) {
-    const self = this;
-    return U.rg(function*() {
-      yield U.cbpromise(Fs.writeFile, yield self.getFile(key), Value.encodeValue(value));
-    });
+  async put(key, value) {
+    return await U.cbpromise(Fs.writeFile, await this.getFile(key), Value.encodeValue(value));
   }
 }
 

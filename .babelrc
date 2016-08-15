@@ -1,4 +1,4 @@
 {
   "presets": ["es2015"],
-  "plugins": ["typecheck", "syntax-flow", "transform-flow-strip-types"]
+  "plugins": ["typecheck", "syntax-flow", "transform-flow-strip-types", "syntax-async-functions", "transform-async-to-generator"]
 }
