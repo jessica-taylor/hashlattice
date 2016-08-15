@@ -28,7 +28,7 @@ class Server {
    */
   getHashData(hash: Buffer) {
     return this.hashDataStore.getHashData(hash);
-  };
+  }
 
   /**
    * Gets the evaluation of the computation with the given hashcode.
@@ -37,15 +37,12 @@ class Server {
    * but only if the computation specifies that it should be stored and the value
    * is data.
    */
-  getHash(hash: Buffer) {
-    const self = this;
-    return U.rg(function*() {
-      try {
-        yield [yield self.hashEvalStore.get(hash)];
-      } catch (err) {
-        yield [yield self._rawEvalComputation(hash, yield self.getHashData(hash))];
-      }
-    });
+  async getHash(hash: Buffer) {
+    try {
+      return await this.hashEvalStore.get(hash);
+    } catch (err) {
+      return await this._rawEvalComputation(hash, await this.getHashData(hash));
+    }
   }
 
   /*Evaluates a static computation.
@@ -60,24 +57,21 @@ class Server {
   Returns:
     Evaluation of the static computation.
     */
-  _rawEvalComputation(hash: Buffer, comp) {
+  async _rawEvalComputation(hash: Buffer, comp) {
     var api = {
       cl: CompLib,
       getHash: _.bind(this.getHash, this),
       getHashData: _.bind(this.getHashData, this),
       evalComputation: _.bind(this.evalComputation, this)
     };
-    const self = this;
-    return U.rg(function*() {
-      var result = yield self.evalComputationFunction(comp, api);
-      if (comp.store && Value.isData(result)) {
-        try {
-          yield self.hashEvalStore.put(hash, result);
-        } catch (err) { }
-      }
-      yield [result];
-    });
-  };
+    var result = await this.evalComputationFunction(comp, api);
+    if (comp.store && Value.isData(result)) {
+      try {
+        await this.hashEvalStore.put(hash, result);
+      } catch (err) { }
+    }
+    return result;
+  }
 
   /*
   Evaluates a static computation.
@@ -96,7 +90,7 @@ class Server {
     var hash = Value.hashData(comp);
     return this.hashEvalStore.get(hash).catch(
         err => this._rawEvalComputation(hash, comp));
-  };
+  }
 
 
   /*
@@ -106,68 +100,63 @@ class Server {
     value: Value to store.
   */
   putHashData(value) {
-    var self = this;
     if (Value.isData(value)) {
-      return self.hashDataStore.putHashData(value);
+      return this.hashDataStore.putHashData(value);
     } else {
       throw new Error('not a value');
     }
-  };
+  }
 
-  putHashDataSplit(comp) {
-    var self = this;
+  async putHashDataSplit(comp) {
     var encoded = Value.encodeValue(comp);
-    return U.rg(function*() {
-      if (encoded.length <= MAX_SIZE) {
-        yield [Value.hashData(yield self.putHashData(comp))];
-      } else {
-        var components = [];
-        for (var i = 0; i < encoded.length; i += MAX_SIZE) {
-          const component = encoded.slice(i, Math.min(encoded.length, i + MAX_SIZE));
-          components.push(component);
-          yield self.putHashData(component);
-        }
-        var combineComp = {
-          data: {'components': _.map(components, Value.hashData)},
-          code: 'evalComputation(cl.value.decodeValue(Buffer.concat(components.map_(_, function(_, c) { return getHashData(c, _); }))), _)'
-        };
-        yield self.putHashDataSplit(combineComp);
+    if (encoded.length <= MAX_SIZE) {
+      return Value.hashData(await this.putHashData(comp));
+    } else {
+      var components = [];
+      for (var i = 0; i < encoded.length; i += MAX_SIZE) {
+        const component = encoded.slice(i, Math.min(encoded.length, i + MAX_SIZE));
+        components.push(component);
+        await this.putHashData(component);
       }
-    });
-  };
+      var combineComp = {
+        data: {'components': _.map(components, Value.hashData)},
+        code: 'evalComputation(cl.value.decodeValue(Buffer.concat(components.map_(_, function(_, c) { return getHashData(c, _); }))), _)'
+      };
+      await this.putHashDataSplit(combineComp);
+    }
+  }
 
-  getVarEvaluator() {
-    var self = this;
+  async getVarEvaluator() {
     var varSpecCache = {};
-    const getVarObj = U.rgf(function*(varSpec) {
+    async function getVarObj(varSpec) {
       var hexVarSpec = Value.encodeValue(varSpec).toString('hex');
       if (hexVarSpec in varSpecCache) {
-        yield [varSpecCache[hexVarSpec]];
+        return varSpecCache[hexVarSpec];
       } else {
-        var varObj = yield self.evalComputation(varSpec);
+        var varObj = await this.evalComputation(varSpec);
         varSpecCache[hexVarSpec] = varObj;
-        yield [varObj];
+        return varObj;
       }
-    });
+    }
     return {
-      defaultValue: U.rgf(function*(varSpec) {
-         yield [yield (yield getVarObj(varSpec)).defaultValue()];
-      }),
-      merge: U.rgf(function*(varSpec) {
-        yield [yield (yield getVarObj(varSpec)).merge(value1, value2)];
-      })
+      defaultValue: async function(varSpec) {
+        return await (await getVarObj(varSpec)).defaultValue();
+      },
+      merge: async function(varSpec) {
+        return await (await getVarObj(varSpec)).merge(value1, value2);
+      }
     };
-  };
+  }
 
   // Gets the value of a variable.
   getVar(varComp) {
     return this.varStore.getVar(varComp);
-  };
+  }
 
   // Puts a variable value.
   putVar(varComp, value) {
     return this.varStore.putVar(varComp, value);
-  };
+  }
 
 }
 
