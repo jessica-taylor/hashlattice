@@ -11,13 +11,13 @@ describe('Server', function() {
   describe('getHashData', function() {
     const value = [1, 2, {}];
     const hash = Value.hashData(value);
-    it('should check hashDataStore', U.rgf(function*() {
+    it('should check hashDataStore', async function() {
       const s = new Server({
         hashDataStore: new Store.CheckingHashStore(new Store.MemoryStore([[hash, value]]))
       });
-      const val = yield s.getHashData(hash);
+      const val = await s.getHashData(hash);
       assert(Value.valuesEqual(value, val));
-    }));
+    });
     it('should report errors correctly', function() {
       var s = new Server({
         hashDataStore: {
@@ -40,69 +40,69 @@ describe('Server', function() {
   var depValue = [comp, value, value];
 
   describe('getHash', function() {
-    it('should check hashEvalStore', U.rgf(function*() {
+    it('should check hashEvalStore', async function() {
       var s = new Server({
         hashEvalStore: new Store.MemoryStore([[hash, value]])
       });
-      assert.equal(value, yield s.getHash(hash));
-    }));
-    it('should evaluate computations', U.rgf(function*() {
+      assert.equal(value, await s.getHash(hash));
+    });
+    it('should evaluate computations', async function() {
       var s = new Server({
         hashDataStore: new Store.CheckingHashStore(new Store.MemoryStore([[hash, comp]]))
       });
-      assert.equal(value, yield s.getHash(hash));
-    }));
-    it('should evaluate dependent computations', U.rgf(function*() {
+      assert.equal(value, await s.getHash(hash));
+    });
+    it('should evaluate dependent computations', async function() {
       var s = new Server({
         hashDataStore: new Store.CheckingHashStore(new Store.MemoryStore([[hash, comp], [depHash, depComp]]))
       });
-      assert(Value.valuesEqual(depValue, yield s.getHash(depHash)));
-    }));
-    it('should report when things are not found', U.rgf(function*() {
+      assert(Value.valuesEqual(depValue, await s.getHash(depHash)));
+    });
+    it('should report when things are not found', async function() {
       var s = new Server();
       try {
-        yield s.getHash(hash);
+        await s.getHash(hash);
         assert.fail();
       } catch (err) {
         assert.equal('not found', err);
       }
-    }));
+    });
   });
   describe('evalComputation', function() {
     var comp = {data: {x: 5}, code: 'x+1'};
     var hash = Value.hashData(comp);
     var value = 6;
-    it('should check hashEvalStore', U.rgf(function*() {
+    it('should check hashEvalStore', async function() {
       var s = new Server({
         hashEvalStore: new Store.MemoryStore([[hash, value]])
       });
-      assert.equal(value, yield s.evalComputation(comp));
-    }));
-    it('should evaluate computations', U.rgf(function*() {
+      assert.equal(value, await s.evalComputation(comp));
+    });
+    it('should evaluate computations', async function() {
       var s = new Server({
         hashDataStore: new Store.CheckingHashStore(new Store.MemoryStore([[hash, comp]]))
       });
-      assert.equal(value, yield s.evalComputation(comp));
-    }));
-    it('should evaluate dependent computations', U.rgf(function*() {
+      assert.equal(value, await s.evalComputation(comp));
+    });
+    it('should evaluate dependent computations', async function() {
       var s = new Server({
         hashDataStore: new Store.CheckingHashStore(new Store.MemoryStore([[hash, comp], [depHash, depComp]]))
       });
-      assert(Value.valuesEqual(depValue, yield s.evalComputation(depComp)));
-    }));
+      assert(Value.valuesEqual(depValue, await s.evalComputation(depComp)));
+    });
   });
   describe('putHashData', function() {
-    it('should insert data so it can be gotten', U.rgf(function*() {
+    it('should insert data so it can be gotten', async function() {
       var s = new Server();
       var comp = {data: {x: 5}, code: 'x+1'};
       var hash = Value.hashData(comp);
       var value = 6;
-      yield s.putHashData(comp);
-      assert.equal(value, yield s.getHash(hash));
-    }));
+      await s.putHashData(comp);
+      assert.equal(value, await s.getHash(hash));
+    });
   });
   describe('putVar', function() {
-    it('should insert variables so they can be gotten', U.rgf(function*() {
+    it('should insert variables so they can be gotten', async function() {
       var s = new Server();
       var varComp = {
         data: {},
@@ -110,9 +110,9 @@ describe('Server', function() {
               ' merge: function(x, y, _) { ' +
               '   return [Math.max(x[0], y[0]), Math.max(x[1], y[1])]; }}'
       };
-      yield s.putVar(varComp, [6, 0]);
-      yield s.putVar(varComp, [0, 5]);
+      await s.putVar(varComp, [6, 0]);
+      await s.putVar(varComp, [0, 5]);
       assert(Value.valuesEqual([6, 5], s.getVar(varComp)));
-    }));
+    });
   });
 });

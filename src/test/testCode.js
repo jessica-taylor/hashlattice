@@ -56,13 +56,11 @@ function testEvalComputation(evalComputation) {
 describe('code', function() {
   testEvalComputation(Code.evalComputation);
   describe('identityComputation', function() {
-    it('should create computations returning the value', function() {
-      return U.rg(function*() {
-        for (const v of U.testDataValues) {
-          const result = yield Code.evalComputation(Code.identityComputation(v), {});
-          assert(Value.valuesEqual(v, result));
-        }
-      });
+    it('should create computations returning the value', async function() {
+      for (const v of U.testDataValues) {
+        const result = await Code.evalComputation(Code.identityComputation(v), {});
+        assert(Value.valuesEqual(v, result));
+      }
     });
   });
 });
