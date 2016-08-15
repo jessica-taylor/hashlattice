@@ -34,29 +34,37 @@ function rg(it) {
   return restPromise(() => it.next());
 }
 
-const rgf = f => function(...args) {
-  return rg(f.apply(this, args));
-};
+function rgf(f: Function) {
+  return function(...args) {
+    return rg(f.apply(this, args));
+  };
+}
 
-const cbpromise = (fn, ...args) => new Promise((resolve, reject) => {
-  fn(...args, function(err, res) {
-    if (err) {
-      reject(err);
-    } else {
-      resolve(res);
-    }
+function cbpromise(fn: Function, ...args) {
+  return new Promise((resolve, reject) => {
+    fn(...args, function(err, res) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(res);
+      }
+    });
   });
-});
+}
 
-const lazy = fn => Promise.resolve().then(fn);
+function lazy(fn: () => Promise) {
+  return Promise.resolve().then(fn);
+}
 
-const waitMs = ms => new Promise(function(resolve, reject) {
-  setTimeout(() => resolve(), ms);
-});
+function waitMs(ms: number) {
+  return new Promise(function(resolve, reject) {
+    setTimeout(() => resolve(), ms);
+  });
+}
 
-const waitUntil = condition => lazy(() =>
-    condition() ? Promise.resolve() : waitMs(30).then(waitUntil(condition))
-  );
+function waitUntil(condition: () => boolean) {
+  return lazy(() => condition() ? Promise.resolve() : waitMs(30).then(waitUntil(condition)));
+}
 
 module.exports = {
   rg: rg,

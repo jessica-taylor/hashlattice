@@ -36,7 +36,9 @@
     "babel-cli": "x.x.x",
     "babel-core": "x.x.x",
     "babel-polyfill": "x.x.x",
-    "babel-preset-flow": "x.x.x",
+    "babel-plugin-syntax-flow": "x.x.x",
+    "babel-plugin-transform-flow-strip-types": "x.x.x",
+    "babel-plugin-typecheck": "x.x.x",
     "babel-preset-es2015": "x.x.x"
   },
   "devDependencies": {

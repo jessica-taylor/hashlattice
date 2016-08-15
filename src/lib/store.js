@@ -18,7 +18,7 @@ var Value = require('./value');
 
 var BROWSER_FS_BYTES = 100*1024*1024;
 
-function reportPutError(err) {
+function reportPutError(err: string) {
   console.log('PUT ERROR', err);
 }
 
@@ -34,7 +34,7 @@ function reportPutError(err) {
 
 // In-memory store.  Implements ValueStore interface.
 class MemoryStore {
-  constructor(initialValues) {
+  constructor(initialValues: Array<[any, any]> = []) {
     this.store = {};
     if (initialValues) {
       for (const v of initialValues) {
@@ -43,28 +43,24 @@ class MemoryStore {
     }
   }
   get(key) {
-    return new Promise((resolve, reject) => {
-      var str = Value.encodeValue(key).toString('hex');
-      if (str in this.store) {
-        resolve(this.store[str]);
-      } else {
-        reject('not found');
-      }
-    });
+    var str = Value.encodeValue(key).toString('hex');
+    if (str in this.store) {
+      return Promise.resolve(this.store[str]);
+    } else {
+      return Promise.reject('not found');
+    }
   }
 
   put(key, value) {
-    return new Promise((resolve, reject) => {
-      this.store[Value.encodeValue(key).toString('hex')] = value;
-      resolve();
-    });
+    this.store[Value.encodeValue(key).toString('hex')] = value;
+    return Promise.resolve();
   }
 }
 
 
 // Store using files in a directory.  Implements ValueStore interface.
 class FileStore {
-  constructor(directory) {
+  constructor(directory: string) {
     this.directory = directory;
     this.made = false;
     mkdirp(this.directory, err => {
@@ -376,10 +372,9 @@ LayeredVarStore.prototype.putVar = function(varSpec, value, callback) {
 };
 
 // Layer multiple variable stores.
-function layerVarStores() {
-  var store = arguments[0];
-  for (var i = 1; i < arguments.length; i++) {
-    store = new LayeredVarStore(store, arguments[i]);
+function layerVarStores(store, ...stores) {
+  for (const st of stores) {
+    store = new LayeredVarStore(store, st);
   }
   return store;
 }
