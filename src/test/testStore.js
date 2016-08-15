@@ -15,10 +15,10 @@ var testValues = {
   '1234': {'a': 5, 'b': [false, {}]}
 };
 
-const assertValuesEqual = U.rgf(function*(store, keys, values) {
+async function assertValuesEqual(store, keys, values) {
   for (const key of keys) {
     try {
-      const value = yield store.get(new Buffer(key, 'hex'));
+      const value = await store.get(new Buffer(key, 'hex'));
       assert(Value.valuesEqual(value, values[key]));
     } catch (err) {
       if (err == 'not found') {
@@ -28,7 +28,7 @@ const assertValuesEqual = U.rgf(function*(store, keys, values) {
       }
     }
   }
-});
+}
 
 
 function testValueStore(store, initialValues) {
@@ -38,13 +38,11 @@ function testValueStore(store, initialValues) {
   it('should initially contain only initial values', function() {
     return assertValuesEqual(store, allKeys, initialValues);
   });
-  it('should contain the union of values after putting', function() {
-    return U.rg(function*() {
-      for (const key of testKeys) {
-        yield store.put(new Buffer(key, 'hex'), testValues[key]);
-      }
-      yield assertValuesEqual(store, allKeys, _.extend(_.clone(initialValues), testValues));
-    });
+  it('should contain the union of values after putting', async function() {
+    for (const key of testKeys) {
+      await store.put(new Buffer(key, 'hex'), testValues[key]);
+    }
+    await assertValuesEqual(store, allKeys, _.extend(_.clone(initialValues), testValues));
   });
 }
 
@@ -96,26 +94,24 @@ describe('LayeredValueStore', function() {
   testValueStore(layered, _.extend(_.clone(store2values), store1values));
 });
 
-function assertHashValuesEqual(store, allValues, initialValues) {
+async function assertHashValuesEqual(store, allValues, initialValues) {
   var initHashes = _.map(allValues, function(v) { return Value.hashData.toString('hex'); });
-  return U.rg(function*() {
-    for (const v of allValues) {
-      var vhash = Value.hashData(v);
-      let value;
-      let success = false;
-      try {
-        value = yield store.getHashData(vhash);
-        success = true;
-      } catch (err) {
-        if (err == 'not found') {
-          assert(!_.contains(initHashes, vhash.toString('hex')));
-        } else {
-          assert.fail(err);
-        }
+  for (const v of allValues) {
+    var vhash = Value.hashData(v);
+    let value;
+    let success = false;
+    try {
+      value = await store.getHashData(vhash);
+      success = true;
+    } catch (err) {
+      if (err == 'not found') {
+        assert(!_.contains(initHashes, vhash.toString('hex')));
+      } else {
+        assert.fail(err);
       }
-      if (success) assert(Value.valuesEqual(v, value));
     }
-  });
+    if (success) assert(Value.valuesEqual(v, value));
+  }
 }
 
 function testHashStore(store, initialValues) {
@@ -123,13 +119,11 @@ function testHashStore(store, initialValues) {
   it('should initially contain only initial values', function() {
     return assertHashValuesEqual(store, allValues, initialValues);
   });
-  it('should contain the union of values after putting', function() {
-    return U.rg(function*() {
-      for (const v of _.values(testValues)) {
-        yield store.putHashData(v);
-      }
-      yield assertHashValuesEqual(store, allValues, allValues);
-    });
+  it('should contain the union of values after putting', async function() {
+    for (const v of _.values(testValues)) {
+      await store.putHashData(v);
+    }
+    await assertHashValuesEqual(store, allValues, allValues);
   });
 }
 

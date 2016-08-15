@@ -162,6 +162,7 @@ BrowserFileStore.prototype.get = function(key, callback) {
 BrowserFileStore.prototype.put = function(key, value, callback) {
   var self = this;
   var key = self.prefix + '-' + Value.encodeValue(key).toString('hex');
+
   function errorHandler(err) {
     callback(err);
   }
@@ -231,18 +232,15 @@ class CheckingHashStore {
     this.valueStore = valueStore;
     assert(this.valueStore);
   }
-  getHashData(hash) {
-    const self = this;
-    return U.rg(function*() {
-      const data = yield self.valueStore.get(hash);
-      if (Value.hashData(data).toString('hex') != hash.toString('hex')) {
-        throw new Error('bad hash')
-      }
-      yield [data];
-    });
+  async getHashData(hash) {
+    const data = await this.valueStore.get(hash);
+    if (Value.hashData(data).toString('hex') != hash.toString('hex')) {
+      throw new Error('bad hash')
+    }
+    return data;
   }
-  putHashData(data) {
-    return this.valueStore.put(Value.hashData(data), data);
+  async putHashData(data) {
+    return await this.valueStore.put(Value.hashData(data), data);
   }
 }
 

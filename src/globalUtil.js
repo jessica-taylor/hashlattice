@@ -1,3 +1,4 @@
+require('babel-core/register');
 require('babel-polyfill');
 const longjohn = require('longjohn');
 

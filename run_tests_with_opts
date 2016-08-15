@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-npm run build && node_modules/.bin/mocha --require longjohn $@ `find build/test -name 'test*.js'`
+npm run build && node_modules/.bin/mocha --require longjohn --compilers js:babel-core/register --require babel-polyfill $@ `find build/test -name 'test*.js'`
