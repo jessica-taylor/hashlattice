@@ -8,10 +8,11 @@ var fs = require('fs');
 
 var Async = require('async');
 var JsYaml = require('js-yaml');
-var U = require('underscore');
+var _ = require('underscore');
 
-var Value = require('./value');
 var Files = require('./files');
+var U = require('./utilities');
+var Value = require('./value');
 
 // We need 4 custom types:
 // !includeYaml foo.yaml -- include a YAML file.  Directory is relative to this file.
@@ -24,11 +25,13 @@ var Files = require('./files');
 //     hash.
 // datatype: 'yaml' or 'binary'
 // filename: name of the file
-function FileRef(fn, datatype, filename) {
-  this.fn = fn;
-  this.datatype = datatype;
-  this.filename = filename;
-};
+class FileRef {
+  constructor(fn, datatype, filename) {
+    this.fn = fn;
+    this.datatype = datatype;
+    this.filename = filename;
+  }
+}
 
 // Maps a function over file references in the data.  That is, the function is
 // called with all file references, and these references are replaced with the
@@ -78,78 +81,75 @@ var fileRefSchema = JsYaml.Schema.create(
      createFileRefType('!hashBinary', 'hash', 'binary')]);
 
 // Reads YAML and handles file references.
-function YamlReader() {
-  // Maps from data type + file name to file data.
-  this.dataMap = {yaml: {}, binary: {}};
-  // Maps from data type + file name to boolean of whether or not this file
-  // currently being loaded.  This can detect circular dependencies.
-  this.loading = {yaml: {}, binary: {}};
-}
+class YamlReader {
+  constructor() {
+    // Maps from data type + file name to file data.
+    this.dataMap = {yaml: {}, binary: {}};
+    // Maps from data type + file name to boolean of whether or not this file
+    // currently being loaded.  This can detect circular dependencies.
+    this.loading = {yaml: {}, binary: {}};
+  }
 
-// Loads a given file as data into this.dataMap.
-YamlReader.prototype.load = function(datatype, filename, _) {
-  var self = this;
-  if (filename in self.dataMap[datatype]) return;
-  var encoding = datatype == 'yaml' ? 'utf8' : undefined;
-  var contents = fs.readFile(filename, {encoding: encoding}, _);
-  // Contents is a string if YAML, Buffer if binary.
-  if (datatype == 'binary') {
-    // For binary files, the data is just the binary file contents.
-    self.dataMap[datatype][filename] = contents;
-  } else {
-    // For YAML, first parse the file into data with file refs.
-    var dataWithFileRefs = JsYaml.safeLoad(contents, {schema: fileRefSchema});
-    // Extract file references.
-    var fileRefs = [];
-    mapOverFileRefs(dataWithFileRefs, function(fref) {
-      fileRefs.push(fref);
-      return fref;
-    });
-    // If any of these is currently loading, this indicates a circular
-    // dependency.
-    if (U.some(fileRefs, function(fref) {
-      // Interpret file paths relative to this yaml file's directory.
-      return self.loading[fref.datatype][Files.relativePath(filename, fref.filename)];
-    })) {
-      throw 'circular dependency';
+  // Loads a given file as data into this.dataMap.
+  async load(datatype, filename) {
+    if (filename in this.dataMap[datatype]) return;
+    var encoding = datatype == 'yaml' ? 'utf8' : undefined;
+    var contents = await U.cbpromise(fs.readFile, filename, {encoding: encoding});
+    // Contents is a string if YAML, Buffer if binary.
+    if (datatype == 'binary') {
+      // For binary files, the data is just the binary file contents.
+      this.dataMap[datatype][filename] = contents;
     } else {
-      self.loading[datatype][filename] = true;
-      // Note lack of parallelism.  This prevents the system from detecting
-      // spurious circular dependencies.
-      fileRefs.forEach_(_, function(_, fref) {
-        self.load(fref.datatype, Files.relativePath(filename, fref.filename), _);
+      // For YAML, first parse the file into data with file refs.
+      var dataWithFileRefs = JsYaml.safeLoad(contents, {schema: fileRefSchema});
+      // Extract file references.
+      var fileRefs = [];
+      mapOverFileRefs(dataWithFileRefs, function(fref) {
+        fileRefs.push(fref);
+        return fref;
       });
-      // Replace file references with data/hashes.
-      var dataSubstituted = mapOverFileRefs(dataWithFileRefs, function(fref) {
-        return self.runFunction(fref.fn, self.dataMap[fref.datatype][Files.relativePath(filename, fref.filename)]);
-      });
-      self.loading[datatype][filename] = false;
-      self.dataMap[datatype][filename] = dataSubstituted;
+      // If any of these is currently loading, this indicates a circular
+      // dependency.
+      // Interpret file paths relative to this yaml file's directory.
+      if (_.some(fileRefs, fref => this.loading[fref.datatype][Files.relativePath(filename, fref.filename)])) {
+        throw 'circular dependency';
+      } else {
+        this.loading[datatype][filename] = true;
+        // Note lack of parallelism.  This prevents the system from detecting
+        // spurious circular dependencies.
+        for (const fref of fileRefs) {
+          await this.load(fref.datatype, Files.relativePath(filename, fref.filename));
+        }
+        // Replace file references with data/hashes.
+        var dataSubstituted = mapOverFileRefs(dataWithFileRefs, fref =>
+          this.runFunction(fref.fn, this.dataMap[fref.datatype][Files.relativePath(filename, fref.filename)]));
+        this.loading[datatype][filename] = false;
+        this.dataMap[datatype][filename] = dataSubstituted;
+      }
     }
   }
-};
 
-// Applies a function ('include' or 'hash') to data.
-YamlReader.prototype.runFunction = function(fn, data) {
-  if (fn == 'include') {
-    return data;
-  } else {
-    assert(fn == 'hash');
-    return Value.hashData(data);
+  // Applies a function ('include' or 'hash') to data.
+  runFunction(fn, data) {
+    if (fn == 'include') {
+      return data;
+    } else {
+      assert(fn == 'hash');
+      return Value.hashData(data);
+    }
   }
-};
 
-// Evaluates a file reference, applying its function to its data.
-YamlReader.prototype.evalFileRef = function(fref, _) {
-  var self = this;
-  self.load(fref.datatype, fref.filename, _);
-  return self.runFunction(fref.fn, self.dataMap[fref.datatype][fref.filename]);
-};
+  // Evaluates a file reference, applying its function to its data.
+  async evalFileRef(fref) {
+    await this.load(fref.datatype, fref.filename);
+    return await this.runFunction(fref.fn, this.dataMap[fref.datatype][fref.filename]);
+  }
+}
 
 // Loads the data in a YAML file, allowing it to refer to other files.
-function loadYamlFile(filename, _) {
+async function loadYamlFile(filename) {
   var reader = new YamlReader();
-  return reader.evalFileRef(new FileRef('include', 'yaml', filename), _);
+  return await reader.evalFileRef(new FileRef('include', 'yaml', filename));
 }
 
 // minimal schema for reading/writing from strings, with no file references

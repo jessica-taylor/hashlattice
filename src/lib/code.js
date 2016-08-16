@@ -3,6 +3,7 @@ var ChildProcess = require('child_process');
 var Vm = require('vm');
 var assert = require('assert');
 
+var Babel = require('babel-core');
 var Escodegen = require('escodegen');
 var Esprima = require('esprima');
 var Estraverse = require('estraverse');
@@ -11,9 +12,17 @@ var _ = require('underscore');
 var Value = require('./value');
 var U = require('./utilities');
 
+const babelOptions = { 
+  "presets": ["es2015"],
+  "plugins": ["syntax-async-functions", "transform-async-to-generator"]
+};
+
+const MAIN_VALUE = "_hl_main_value";
+
 
 function transformExpr(code) {
-  return code;
+  const body = Babel.transform('const ' + MAIN_VALUE + ' = ' + code + ';', babelOptions).code;
+  return '(function() { ' + body + ' return ' + MAIN_VALUE + '})()';
 }
 
 function evalComputation(comp, api) {
@@ -24,6 +33,7 @@ function evalComputation(comp, api) {
   sandbox.underscore = U;
   // TODO: this is kind of dangerous
   sandbox.require = require;
+  sandbox.regeneratorRuntime = regeneratorRuntime;
 
   if (typeof comp.data == 'object') {
     for (const key in comp.data) {
@@ -32,16 +42,13 @@ function evalComputation(comp, api) {
   }
   const apiKeys = _.keys(api);
   const apiValues = _.map(apiKeys, function(k) { return api[k]; });
-  let result;
   try {
-    const code = '(function(' + apiKeys.join(', ') + ') { return ' + transformExpr(comp.code) + '; })';
+    const code = transformExpr('(async function(' + apiKeys.join(', ') + ') { return ' + comp.code + '; })');
     const apiToValue = Vm.runInNewContext(code, sandbox);
-    // TODO asynchronous
-    result = apiToValue(...apiValues)
+    return apiToValue(...apiValues);
   } catch (ex) {
     return Promise.reject(ex);
   }
-  return Promise.resolve(result);
 }
 
 /**

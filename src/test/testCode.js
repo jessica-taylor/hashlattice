@@ -21,7 +21,7 @@ function testEvalComputation(evalComputation) {
                              {plus: function(x, y) { return x + y; }}).then(
                                result => assert.equal(6, result));
     });
-    if (false) it('should allow asynchronous API access', function() {
+    it('should allow asynchronous API access', function() {
       var api = {
         plus: function(x, y) {
           return new Promise(function(resolve, reject) {
@@ -29,10 +29,10 @@ function testEvalComputation(evalComputation) {
           });
         },
         minus: function(x, y) {
-          return Promise.resolve(x-1);
+          return Promise.resolve(x-y);
         }
       };
-      var code = 'function*() { yield [yield plus(yield minus(x, 2), 5)] }';
+      var code = 'await plus(await minus(x, 2), 5)';
 
       return evalComputation({data: {x: 1}, code: code}, api).then(
           result => assert.equal(4, result));

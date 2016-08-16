@@ -35,7 +35,7 @@ describe('Server', function() {
   var hash = Value.hashData(comp);
   var value = 6;
   var depComp = {data: {c: comp, h: hash}, 
-                 code: '[getHashData(h, _), evalComputation(c, _), getHash(h, _)]'};
+                 code: '[await getHashData(h), await evalComputation(c), await getHash(h)]'};
   var depHash = Value.hashData(depComp);
   var depValue = [comp, value, value];
 
@@ -106,13 +106,13 @@ describe('Server', function() {
       var s = new Server();
       var varComp = {
         data: {},
-        code: '{defaultValue: function(_) { return [0,0]; }, ' +
-              ' merge: function(x, y, _) { ' +
+        code: '{defaultValue: async function() { return [0,0]; }, ' +
+              ' merge: async function(x, y) { ' +
               '   return [Math.max(x[0], y[0]), Math.max(x[1], y[1])]; }}'
       };
       await s.putVar(varComp, [6, 0]);
       await s.putVar(varComp, [0, 5]);
-      assert(Value.valuesEqual([6, 5], s.getVar(varComp)));
+      assert(Value.valuesEqual([6, 5], await s.getVar(varComp)));
     });
   });
 });

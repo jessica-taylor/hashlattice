@@ -296,71 +296,71 @@ function layerHashStores(store, ...stores) {
  *   perhaps with an error.
  */
 
-// Var stores don't work!
 // Variable store backed by a ValueStore that merges new values in.
-function MergingVarStore(varEvaluator, valueStore) {
-  this.varEvaluator = varEvaluator;
-  this.valueStore = valueStore;
-  this.lock = new ReadWriteLock();
-}
-
-MergingVarStore.prototype.getVar = function(varSpec, _) {
-  var self = this;
-  var varSpecHash = Value.hashData(varSpec);
-  var def = this.varEvaluator.defaultValue(varSpec, _);
-  try {
-    var got = this.valueStore.get(varSpecHash, _);
-  } catch (err) {
-    return def;
+class MergingVarStore {
+  constructor(varEvaluator, valueStore) {
+    this.varEvaluator = varEvaluator;
+    this.valueStore = valueStore;
+    this.lock = new ReadWriteLock();
   }
-  try {
-    return this.varEvaluator.merge(varSpec, def, got, _);
-  } catch (err) {
-    return got;
-  }
-};
-
-MergingVarStore.prototype.putVar = function(varSpec, value, _) {
-  var varSpecHash = Value.hashData(varSpec);
-  var def = this.varEvaluator.defaultValue(varSpec, _);
-  var release = this.lock.async.writeLock(_);
-  try {
-    var oldValue = def;
+  async getVar(varSpec) {
+    var varSpecHash = Value.hashData(varSpec);
+    var def = await this.varEvaluator.defaultValue(varSpec);
     try {
-      var got = this.valueStore.get(varSpecHash, _);
-      oldValue = this.varEvaluator.merge(varSpec, def, got, _);
+      var got = await this.valueStore.get(varSpecHash);
     } catch (err) {
+      return def;
     }
-    var merged = this.varEvaluator.merge(varSpec, oldValue, value, _);
-    this.valueStore.put(varSpecHash, merged, _);
-    return merged;
-  } finally {
-    release();
+    try {
+      return await this.varEvaluator.merge(varSpec, def, got);
+    } catch (err) {
+      return got;
+    }
   }
-};
-
-function LayeredVarStore(store1, store2) {
-  this.store1 = store1;
-  this.store2 = store2;
+  async putVar(varSpec, value) {
+    const varSpecHash = Value.hashData(varSpec);
+    const def = await this.varEvaluator.defaultValue(varSpec);
+    const release = await U.cbpromise(this.lock.async.writeLock);
+    try {
+      let oldValue = def;
+      try {
+        const got = await this.valueStore.get(varSpecHash);
+        oldValue = await this.varEvaluator.merge(varSpec, def, got);
+      } catch (err) {
+      }
+      const merged = await this.varEvaluator.merge(varSpec, oldValue, value);
+      await this.valueStore.put(varSpecHash, merged);
+      return merged;
+    } finally {
+      release();
+    }
+  }
 }
 
-LayeredVarStore.prototype.getVar = function(varSpec, callback) {
-  var self = this;
-  self.store2.getVar(varSpec, function(err, v2) {
-    if (err) {
-      self.store1.getVar(varSpec, callback);
-    } else {
-      self.store1.putVar(varSpec, v2, callback);
-    }
-  });
-};
 
-LayeredVarStore.prototype.putVar = function(varSpec, value, callback) {
-  var self = this;
-  self.store1.putVar(varSpec, value, function(err, v1) {
-    self.store2.putVar(varSpec, err ? value : v1, callback);
-  });
-};
+
+class LayeredVarStore {
+  constructor(store1, store2) {
+    this.store1 = store1;
+    this.store2 = store2;
+  }
+  async getVar(varSpec) {
+    try {
+      const v2 = await this.store2.getVar(varSpec);
+      return await this.store1.putVar(varSpec, v2);
+    } catch(err) {
+      return await this.store1.getVar(varSpec);
+    }
+  }
+  async putVar(varSpec, value) {
+    try {
+      const v1 = await this.store1.putVar(varSpec, value);
+      return await this.store2.putVar(varSpec, v1);
+    } catch (err) {
+      return await this.store2.putVar(varSpec, value);
+    }
+  }
+}
 
 // Layer multiple variable stores.
 function layerVarStores(store, ...stores) {

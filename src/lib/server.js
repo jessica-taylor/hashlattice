@@ -126,23 +126,23 @@ class Server {
     }
   }
 
-  async getVarEvaluator() {
-    var varSpecCache = {};
-    async function getVarObj(varSpec) {
-      var hexVarSpec = Value.encodeValue(varSpec).toString('hex');
+  getVarEvaluator() {
+    const varSpecCache = {};
+    const getVarObj = async varSpec => {
+      const hexVarSpec = Value.encodeValue(varSpec).toString('hex');
       if (hexVarSpec in varSpecCache) {
         return varSpecCache[hexVarSpec];
       } else {
-        var varObj = await this.evalComputation(varSpec);
+        const varObj = await this.evalComputation(varSpec);
         varSpecCache[hexVarSpec] = varObj;
         return varObj;
       }
-    }
+    };
     return {
       defaultValue: async function(varSpec) {
         return await (await getVarObj(varSpec)).defaultValue();
       },
-      merge: async function(varSpec) {
+      merge: async function(varSpec, value1, value2) {
         return await (await getVarObj(varSpec)).merge(value1, value2);
       }
     };

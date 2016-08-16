@@ -25,37 +25,33 @@ var dependentData = [1, 2, simpleData, Value.hashData(simpleData),
 describe('yaml', function() {
   describe('dataToYaml', function() {
     it('should convert data to readable YAML', function() {
-      U.each(testDataValues, function(data) {
+      for(const data of testDataValues) {
         assert(Value.valuesEqual(data, Yaml.yamlToData(Yaml.dataToYaml(data))));
-      });
+      }
     });
   });
   describe('loadYamlFile', function() {
-    it('should read simple data YAML files', function(done) {
-      Yaml.loadYamlFile(simpleDataYamlFile, function(err, data) {
-        assert(!err, err);
-        assert(Value.valuesEqual(simpleData, data));
-        done();
-      });
+    it('should read simple data YAML files', async function() {
+      assert(Value.valuesEqual(simpleData, await Yaml.loadYamlFile(simpleDataYamlFile)));
     });
-    it('should allow dependencies', function(done) {
-      Yaml.loadYamlFile(dependentYamlFile, function(err, data) {
-        assert(!err, err);
-        assert(Value.valuesEqual(dependentData, data));
-        done();
-      });
+    it('should allow dependencies', async function() {
+      assert(Value.valuesEqual(dependentData, await Yaml.loadYamlFile(dependentYamlFile)));
     });
-    it('should detect circular dependencies', function(done) {
-      Yaml.loadYamlFile('./test/testdata/circular.yaml', function(err, data) {
+    it('should detect circular dependencies', async function() {
+      try {
+        await Yaml.loadYamlFile('./build/test/testdata/circular.yaml');
+        assert.fail();
+      } catch (err) {
         assert.equal('circular dependency', err);
-        done();
-      });
+      }
     });
-    it('should detect mutual dependencies', function(done) {
-      Yaml.loadYamlFile('./test/testdata/mutual1.yaml', function(err, data) {
+    it('should detect mutual dependencies', async function() {
+      try {
+        await Yaml.loadYamlFile('./build/test/testdata/mutual1.yaml');
+        assert.fail();
+      } catch (err) {
         assert.equal('circular dependency', err);
-        done();
-      });
+      }
     });
   });
 });
